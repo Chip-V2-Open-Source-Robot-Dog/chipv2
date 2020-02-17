@@ -14,9 +14,15 @@ public class Leg {
         KNEE;
     }
 
-    public enum ChipControlType {
-        VELOCITY = ControlType.kVelocity,
-        POSITION = ControlType.kPosition;
+    public enum MotorControlType {
+        VELOCITY(ControlType.kVelocity),
+        POSITION(ControlType.kPosition);
+
+        public ControlType sparkMaxType;
+
+        private MotorControlType(ControlType sparkMaxType) {
+            this.sparkMaxType = sparkMaxType;
+        }
     }
 
     public CANSparkMax shoulder, hinge, knee;
@@ -33,46 +39,43 @@ public class Leg {
         kneePID.load(knee.getPIDController());
     }
 
-    public void setReferences(double shoulderVal, double hingeVal, double kneeVal, ChipControlType type) {
-        shoulder.getPIDController().setReference(shoulderVal, type);
-        hinge.getPIDController().setReference(hingeVal, type);
-        knee.getPIDController().setReference(kneeVal, type);
+    public void set(MotorControlType controlType, double shoulderVal, double hingeVal, double kneeVal) {
+        shoulder.getPIDController().setReference(shoulderVal, controlType.sparkMaxType);
+        hinge.getPIDController().setReference(hingeVal, controlType.sparkMaxType);
+        knee.getPIDController().setReference(kneeVal, controlType.sparkMaxType);
     }
 
-    public double getEncoderVals(JointType joint, ChipControlType type) {
-        switch(type){
-            case VELOCITY:
-                switch (joint) {
-                    case SHOULDER:
-                        return shoulder.getEncoder().getVelocity();
-                    case HINGE:
-                        return hinge.getEncoder().getVelocity();
-                    case KNEE:
-                        return knee.getEncoder().getVelocity();
-                }
-                break;
-            case POSITION:
-                switch (joint) {
-                    case SHOULDER:
-                        return shoulder.getEncoder().getPosition();
-                    case HINGE:
-                        return hinge.getEncoder().getPosition();
-                    case KNEE:
-                        return knee.getEncoder().getPosition();
-                }
-                break;
-                //We may want to at some point convert position to our reference angles?
+    public double getPosition(JointType joint) {
+        switch (joint) {
+            case SHOULDER:
+                return shoulder.getEncoder().getPosition();
+            case HINGE:
+                return hinge.getEncoder().getPosition();
+            case KNEE:
+                return knee.getEncoder().getPosition();
+        }
+        return 0;
+    }
+
+    public double getVelocity(JointType joint) {
+        switch (joint) {
+            case SHOULDER:
+                return shoulder.getEncoder().getVelocity();
+            case HINGE:
+                return hinge.getEncoder().getVelocity();
+            case KNEE:
+                return knee.getEncoder().getVelocity();
         }
         return 0;
     }
 
     public void updateDashboard(String name) {
-        SmartDashboard.putNumber(name + " - Shoulder Velocity", getEncoderVals(JointType.SHOULDER, ChipControlType.VELOCITY));
-        SmartDashboard.putNumber(name + " - Hinge Velocity", getEncoderVals(JointType.HINGE, ChipControlType.VELOCITY));
-        SmartDashboard.putNumber(name + " - Knee Velocity", getEncoderVals(JointType.KNEE, ChipControlType.VELOCITY));
+        SmartDashboard.putNumber(name + " - Shoulder Velocity", getVelocity(JointType.SHOULDER));
+        SmartDashboard.putNumber(name + " - Hinge Velocity", getVelocity(JointType.HINGE));
+        SmartDashboard.putNumber(name + " - Knee Velocity", getVelocity(JointType.KNEE));
 
-        SmartDashboard.putNumber(name + " - Shoulder Position", getEncoderVals(JointType.SHOULDER, ChipControlType.POSITION));
-        SmartDashboard.putNumber(name + " - Hinge Position", getEncoderVals(JointType.HINGE, ChipControlType.POSITION));
-        SmartDashboard.putNumber(name + " - Knee Position", getEncoderVals(JointType.KNEE, ChipControlType.POSITION));
+        SmartDashboard.putNumber(name + " - Shoulder Position", getPosition(JointType.SHOULDER));
+        SmartDashboard.putNumber(name + " - Hinge Position", getPosition(JointType.HINGE));
+        SmartDashboard.putNumber(name + " - Knee Position", getPosition(JointType.KNEE));
     }
 }

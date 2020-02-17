@@ -8,14 +8,9 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.mechanisms.Leg.JointType;
-import edu.mit.chip.mechanisms.Leg.ChipControlType;
+import edu.mit.chip.mechanisms.Leg.MotorControlType;
 import edu.mit.chip.utils.PIDConstants;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import com.revrobotics.CANSparkMax;
 
 /**
 * The VM is configured to automatically run this class, and to call the
@@ -126,10 +121,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
-        frontRightLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
-        backLeftLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
-        backRightLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
+        frontLeftLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
+        frontRightLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
+        backLeftLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
+        backRightLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
     }
     
     /**
