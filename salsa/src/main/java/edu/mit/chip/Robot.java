@@ -9,6 +9,7 @@ package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.mechanisms.Leg.JointType;
+import edu.mit.chip.mechanisms.Leg.ChipControlType;
 import edu.mit.chip.utils.PIDConstants;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,6 +25,7 @@ import com.revrobotics.CANSparkMax;
 * project.
 */
 public class Robot extends TimedRobot {
+
     public Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
     
     private final double kP = 0.001;
@@ -124,10 +126,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.setVelocities(0, 0, 0);
-        frontRightLeg.setVelocities(0, 0, 0);
-        backLeftLeg.setVelocities(0, 0, 0);
-        backRightLeg.setVelocities(0, 0, 0);
+        frontLeftLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
+        frontRightLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
+        backLeftLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
+        backRightLeg.setReferences(0, 0, 0, ChipControlType.VELOCITY);
     }
     
     /**
