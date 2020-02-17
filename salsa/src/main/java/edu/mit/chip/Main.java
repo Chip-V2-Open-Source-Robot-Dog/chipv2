@@ -5,9 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot;
+package edu.mit.chip;
 
 import edu.wpi.first.wpilibj.RobotBase;
+
+import com.revrobotics.CANSparkMax;
 
 /**
  * Do NOT add any static variables to this class, or any initialization at all.
