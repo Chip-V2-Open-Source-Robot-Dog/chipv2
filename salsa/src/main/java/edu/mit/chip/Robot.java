@@ -8,7 +8,7 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.mechanisms.Leg.MotorControlType;
+import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
 
     public Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
     
-    private final double kP = 0.001;
+    private final double kP = 0.050;
     private final double kI = 0;
     private final double kD = 0;
     
@@ -33,10 +33,11 @@ public class Robot extends TimedRobot {
     private final double kMaxOutput =  1.0;
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
+
+    private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
     
     /**
-    * This function is run when the robot is first started up and should be
-    * used for any initialization code.
+    * This function is run when the robot code is first started up (or restarted).
     */
     @Override
     public void robotInit() {
@@ -51,39 +52,34 @@ public class Robot extends TimedRobot {
         System.out.println("Legs constructed.");
         
         frontLeftLeg.loadPID(
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
 
         frontRightLeg.loadPID(
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
         
         backLeftLeg.loadPID(
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
 
         backRightLeg.loadPID(
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
         
         System.out.println("Robot initialized.");
     }
     
     /**
-    * This function is called every robot packet, no matter the mode. Use
-    * this for items like diagnostics that you want ran during disabled,
-    * autonomous, teleoperated and test.
-    *
-    * <p>This runs after the mode specific periodic functions, but before
-    * LiveWindow and SmartDashboard integrated updating.
+    * This function is called every robot packet, no matter the mode.
     */
     @Override
     public void robotPeriodic() {
@@ -93,44 +89,26 @@ public class Robot extends TimedRobot {
         backLeftLeg.updateDashboard("Back Left");
         backRightLeg.updateDashboard("Back Right");
     }
-    
+
     /**
-    * This autonomous (along with the chooser code above) shows how to select
-    * between different autonomous modes using the dashboard. The sendable
-    * chooser code works with the Java SmartDashboard. If you prefer the
-    * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-    * getString line to get the auto name from the text box below the Gyro
-    *
-    * <p>You can add additional auto modes by adding additional comparisons to
-    * the switch structure below with additional strings. If using the
-    * SendableChooser make sure to add them to the chooser code above as well.
-    */
+     * This function is called at the very beginning of the teleoperated period.
+     */
     @Override
-    public void autonomousInit() {
+    public void teleopInit() {
+        frontLeftPosition  = frontLeftLeg.getPosition();
+        frontRightPosition = frontRightLeg.getPosition();
+        backLeftPosition   = backLeftLeg.getPosition();
+        backRightPosition  = backRightLeg.getPosition();
     }
     
     /**
-    * This function is called periodically during autonomous.
-    */
-    @Override
-    public void autonomousPeriodic() {
-    }
-    
-    /**
-    * This function is called periodically during operator control.
+    * This function is called periodically during teleoperated period.
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
-        frontRightLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
-        backLeftLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
-        backRightLeg.set(MotorControlType.VELOCITY, 0, 0, 0);
-    }
-    
-    /**
-    * This function is called periodically during test mode.
-    */
-    @Override
-    public void testPeriodic() {
+        frontLeftLeg.set(frontLeftPosition);
+        frontRightLeg.set(frontRightPosition);
+        backLeftLeg.set(backLeftPosition);
+        backRightLeg.set(backRightPosition);
     }
 }

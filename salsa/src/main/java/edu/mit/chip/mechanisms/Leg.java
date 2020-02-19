@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -43,6 +44,14 @@ public class Leg {
         shoulder.getPIDController().setReference(shoulderVal, controlType.sparkMaxType);
         hinge.getPIDController().setReference(hingeVal, controlType.sparkMaxType);
         knee.getPIDController().setReference(kneeVal, controlType.sparkMaxType);
+    }
+
+    public void set(LegPosition legPosition) {
+        set(MotorControlType.POSITION, legPosition.shoulder, legPosition.hinge, legPosition.knee);
+    }
+
+    public LegPosition getPosition() {
+        return new LegPosition(getPosition(JointType.SHOULDER), getPosition(JointType.HINGE), getPosition(JointType.KNEE));
     }
 
     public double getPosition(JointType joint) {
