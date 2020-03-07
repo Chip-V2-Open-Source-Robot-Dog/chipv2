@@ -16,6 +16,7 @@ public class Leg {
     }
 
     public enum MotorControlType {
+        VOLTAGE(ControlType.kVoltage),
         VELOCITY(ControlType.kVelocity),
         POSITION(ControlType.kPosition);
 
@@ -46,12 +47,22 @@ public class Leg {
         knee.getPIDController().setReference(kneeVal, controlType.sparkMaxType);
     }
 
+    public void neutral() {
+        set(MotorControlType.VOLTAGE, 0, 0, 0);
+    }
+
     public void set(LegPosition legPosition) {
         set(MotorControlType.POSITION, legPosition.shoulder, legPosition.hinge, legPosition.knee);
     }
 
     public LegPosition getPosition() {
         return new LegPosition(getPosition(JointType.SHOULDER), getPosition(JointType.HINGE), getPosition(JointType.KNEE));
+    }
+
+    public void setEncoders(LegPosition legPosition) {
+        shoulder.getEncoder().setPosition(legPosition.shoulder);
+        hinge.getEncoder().setPosition(legPosition.hinge);
+        knee.getEncoder().setPosition(legPosition.knee);
     }
 
     public double getPosition(JointType joint) {

@@ -8,9 +8,13 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
+import edu.mit.chip.setupactions.SetupActionChooser;
+import edu.mit.chip.setupactions.ZeroLegAction;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.command.Scheduler;
 
 /**
 * The VM is configured to automatically run this class, and to call the
@@ -20,8 +24,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 * project.
 */
 public class Robot extends TimedRobot {
-
     public Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
+
+    private SetupActionChooser setupActionChooser;
     
     private final double kP = 0.050;
     private final double kI = 0;
@@ -33,49 +38,57 @@ public class Robot extends TimedRobot {
     private final double kMaxOutput =  1.0;
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
-
+    
     private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
     
     /**
     * This function is run when the robot code is first started up (or restarted).
     */
     @Override
-    public void robotInit() {
+    public void robotInit() {        
         System.out.println("Initializing robot...");
         System.out.println("Attempting to construct legs.");
-
+                
         frontLeftLeg  = new Leg(3, 2, 1);
         frontRightLeg = new Leg(12, 10, 11);
         backLeftLeg   = new Leg(4, 5, 6);
         backRightLeg  = new Leg(9, 7, 8);
-
+        
         System.out.println("Legs constructed.");
         
         frontLeftLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-
+        
         frontRightLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
         
         backLeftLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-
+        
         backRightLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
+        new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
         
         System.out.println("Robot initialized.");
+
+        setupActionChooser = new SetupActionChooser(
+            new ZeroLegAction(frontLeftLeg, "Front Left"),
+            new ZeroLegAction(frontRightLeg, "Front Right"),
+            new ZeroLegAction(backLeftLeg, "Back Left"),
+            new ZeroLegAction(backRightLeg, "Back Right")
+        );
+        setupActionChooser.putOnDashboard();
     }
     
     /**
@@ -85,14 +98,14 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         frontLeftLeg.updateDashboard("Front Left");
         frontRightLeg.updateDashboard("Front Right");
-
+        
         backLeftLeg.updateDashboard("Back Left");
         backRightLeg.updateDashboard("Back Right");
     }
-
+    
     /**
-     * This function is called at the very beginning of the teleoperated period.
-     */
+    * This function is called at the very beginning of the teleoperated period.
+    */
     @Override
     public void teleopInit() {
         frontLeftPosition  = frontLeftLeg.getPosition();
@@ -110,5 +123,36 @@ public class Robot extends TimedRobot {
         frontRightLeg.set(frontRightPosition);
         backLeftLeg.set(backLeftPosition);
         backRightLeg.set(backRightPosition);
+    }
+    
+    /**
+    * This fetches which SetupAction the user has selected and places it in the 
+    * CommandQueue.
+    */
+    @Override
+    public void autonomousInit() {
+        Scheduler.getInstance().add(setupActionChooser.getChosenActionCmd());
+    }
+    
+    /**
+    * This function is called periodically during autonomous. We use it to run
+    * SetupAction commands.
+    */
+    @Override
+    public void autonomousPeriodic() {
+        Scheduler.getInstance().run();
+    }
+
+    /**
+     * This function is called once each time the robot enters Disabled mode.
+     */
+    @Override
+    public void disabledInit() {
+        frontLeftLeg.neutral();
+        frontRightLeg.neutral();
+        backLeftLeg.neutral();
+        backRightLeg.neutral();
+
+        Scheduler.getInstance().removeAll();
     }
 }
