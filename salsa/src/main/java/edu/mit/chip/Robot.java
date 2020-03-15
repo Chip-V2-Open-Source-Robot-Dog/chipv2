@@ -28,7 +28,10 @@ public class Robot extends TimedRobot {
 
     private SetupActionChooser setupActionChooser;
     
-    private final double kP = 0.050;
+    /*
+    ADI CHANGED THIS
+    */
+    private final double kP = 0.005;
     private final double kI = 0;
     private final double kD = 0;
     
@@ -40,7 +43,10 @@ public class Robot extends TimedRobot {
     private final double maxRPM = 5700;
     
     private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
-    
+    /*
+    END CHANGES
+    */
+
     /**
     * This function is run when the robot code is first started up (or restarted).
     */
@@ -48,11 +54,22 @@ public class Robot extends TimedRobot {
     public void robotInit() {        
         System.out.println("Initializing robot...");
         System.out.println("Attempting to construct legs.");
-                
-        frontLeftLeg  = new Leg(3, 2, 1);
-        frontRightLeg = new Leg(12, 10, 11);
-        backLeftLeg   = new Leg(4, 5, 6);
-        backRightLeg  = new Leg(9, 7, 8);
+        
+        /*
+        ADI EDITED THIS PART
+        */
+        double[] modelFLL = {0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
+        double[] modelFRL = {0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
+        double[] modelBLL = {0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
+        double[] modelBRL = {0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
+
+        frontLeftLeg  = new Leg(3, 2, 1, modelFLL);
+        frontRightLeg = new Leg(12, 10, 11, modelFRL);
+        backLeftLeg   = new Leg(4, 5, 6, modelBLL);
+        backRightLeg  = new Leg(9, 7, 8, modelBRL);
+        /*
+        END EDITING
+        */
         
         System.out.println("Legs constructed.");
         
@@ -117,13 +134,22 @@ public class Robot extends TimedRobot {
     /**
     * This function is called periodically during teleoperated period.
     */
+    /*
+    ADI EDITED THIS CODE
+    */
     @Override
     public void teleopPeriodic() {
+        double xDesired = 0.0;
+        double yDesired = 0.5;
+        double zDesired = 0.0;
         frontLeftLeg.set(frontLeftPosition);
-        frontRightLeg.set(frontRightPosition);
+        frontRightLeg.moveLeg(xDesired, yDesired, zDesired);
         backLeftLeg.set(backLeftPosition);
         backRightLeg.set(backRightPosition);
     }
+    /*
+    DONE EDITING
+    */
     
     /**
     * This fetches which SetupAction the user has selected and places it in the 
