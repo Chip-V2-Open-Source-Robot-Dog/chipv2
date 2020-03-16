@@ -16,6 +16,8 @@ import edu.mit.chip.utils.PIDConstants;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
 
+import edu.wpi.first.wpilibj.Joystick;
+
 /**
 * The VM is configured to automatically run this class, and to call the
 * functions corresponding to each mode, as described in the TimedRobot
@@ -28,9 +30,9 @@ public class Robot extends TimedRobot {
 
     private SetupActionChooser setupActionChooser;
     
-    private final double kP = 0.050;
-    private final double kI = 0;
-    private final double kD = 0;
+    private final double kP = 0.1;
+    private final double kI = 0.0;
+    private final double kD = 0.05;
     
     private final double kIz = 0;
     private final double kFF = 0;
@@ -40,6 +42,8 @@ public class Robot extends TimedRobot {
     private final double maxRPM = 5700;
     
     private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
+
+    Joystick joy = new Joystick(0);
     
     /**
     * This function is run when the robot code is first started up (or restarted).
@@ -108,10 +112,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        frontLeftPosition  = frontLeftLeg.getPosition();
-        frontRightPosition = frontRightLeg.getPosition();
-        backLeftPosition   = backLeftLeg.getPosition();
-        backRightPosition  = backRightLeg.getPosition();
+
     }
     
     /**
@@ -119,6 +120,27 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
+        // Get value of right joy y axis: joy.getRawAxis(5);
+        double incrementOne = -2.0*joy.getRawAxis(1);
+        double incrementTwo = 2.0*joy.getRawAxis(5);
+
+        frontLeftPosition  = frontLeftLeg.getPosition();
+        frontRightPosition = frontRightLeg.getPosition();
+        backLeftPosition   = backLeftLeg.getPosition();
+        backRightPosition  = backRightLeg.getPosition();
+
+        frontLeftPosition.shoulder = frontLeftPosition.shoulder+incrementOne;
+        frontLeftPosition.knee = frontLeftPosition.knee-2.0*incrementTwo;
+
+        frontRightPosition.shoulder = frontRightPosition.shoulder-incrementOne;
+        frontRightPosition.knee = frontRightPosition.knee+2.0*incrementTwo;
+
+        backLeftPosition.shoulder = backLeftPosition.shoulder+incrementOne;
+        backLeftPosition.knee = backLeftPosition.knee-2.0*incrementTwo;
+
+        backRightPosition.shoulder = backRightPosition.shoulder-incrementOne;
+        backRightPosition.knee = backRightPosition.knee+2.0*incrementTwo;
+
         frontLeftLeg.set(frontLeftPosition);
         frontRightLeg.set(frontRightPosition);
         backLeftLeg.set(backLeftPosition);
