@@ -121,8 +121,9 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         // Get value of right joy y axis: joy.getRawAxis(5);
-        double incrementOne = -2.0*joy.getRawAxis(1);
-        double incrementTwo = 2.0*joy.getRawAxis(5);
+        double speedFactor = 1.0;
+        double incrementOne = -speedFactor*joy.getRawAxis(1);
+        double incrementTwo = speedFactor*joy.getRawAxis(5);
 
         frontLeftPosition  = frontLeftLeg.getPosition();
         frontRightPosition = frontRightLeg.getPosition();
