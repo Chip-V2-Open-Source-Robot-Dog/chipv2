@@ -52,11 +52,14 @@ public class Robot extends TimedRobot {
     public void robotInit() {        
         System.out.println("Initializing robot...");
         System.out.println("Attempting to construct legs.");
+
+        double[] leftLeg = new double[]{0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
+        double[] rightLeg = new double[]{0.055, -0.075, 0.235, 0.1, -0.03, 0.32};
                 
-        frontLeftLeg  = new Leg(3, 2, 1);
-        frontRightLeg = new Leg(12, 10, 11);
-        backLeftLeg   = new Leg(4, 5, 6);
-        backRightLeg  = new Leg(9, 7, 8);
+        frontLeftLeg  = new Leg(3, 2, 1, leftLeg, true, true, true);
+        frontRightLeg = new Leg(12, 10, 11, rightLeg, false, true, false);
+        backLeftLeg   = new Leg(4, 5, 6, leftLeg, true, true, true);
+        backRightLeg  = new Leg(9, 7, 8, rightLeg, false, true, false);
         
         System.out.println("Legs constructed.");
         
@@ -112,10 +115,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        frontLeftHome  = frontLeftLeg.getPosition();
-        frontRightHome = frontRightLeg.getPosition();
-        backLeftHome   = backLeftLeg.getPosition();
-        backRightHome  = backRightLeg.getPosition();
+
     }
     
     /**
@@ -123,8 +123,16 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
+        //double legSpeed = 0.05; //we will set this as constant for now... 
+        //double epsilon = 0.01;
+        //frontLeftLeg.moveLegAttenuatedPID(0.0, -0.5, frontLeftLeg.home[2], legSpeed, epsilon);
+        //frontRightLeg.moveLegAttenuatedPID(0.0, 0.5, frontRightLeg.home[2], legSpeed, epsilon);
+        //backLeftLeg.moveLegAttenuatedPID(0.0, -0.5, backLeftLeg.home[2], legSpeed, epsilon);
+        //backRightLeg.moveLegAttenuatedPID(0.0, 0.5, backRightLeg.home[2], legSpeed, epsilon); 
+
+        
         // Get value of right joy y axis: joy.getRawAxis(5);
-        double speedFactor = 1.0;
+        double speedFactor = 2.0;
         double incrementOne = -speedFactor*joy.getRawAxis(1);
         double incrementTwo = speedFactor*joy.getRawAxis(5);
 
