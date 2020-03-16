@@ -123,14 +123,6 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        //double legSpeed = 0.05; //we will set this as constant for now... 
-        //double epsilon = 0.01;
-        //frontLeftLeg.moveLegAttenuatedPID(0.0, -0.5, frontLeftLeg.home[2], legSpeed, epsilon);
-        //frontRightLeg.moveLegAttenuatedPID(0.0, 0.5, frontRightLeg.home[2], legSpeed, epsilon);
-        //backLeftLeg.moveLegAttenuatedPID(0.0, -0.5, backLeftLeg.home[2], legSpeed, epsilon);
-        //backRightLeg.moveLegAttenuatedPID(0.0, 0.5, backRightLeg.home[2], legSpeed, epsilon); 
-
-        
         // Get value of right joy y axis: joy.getRawAxis(5);
         double speedFactor = 2.0;
         double incrementOne = -speedFactor*joy.getRawAxis(1);
@@ -175,7 +167,6 @@ public class Robot extends TimedRobot {
         frontRightLeg.set(frontRightPosition);
         backLeftLeg.set(backLeftPosition);
         backRightLeg.set(backRightPosition);
-        
     }
     
     /**
