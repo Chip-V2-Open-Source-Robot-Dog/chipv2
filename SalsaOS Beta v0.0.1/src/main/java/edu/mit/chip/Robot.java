@@ -30,9 +30,9 @@ public class Robot extends TimedRobot {
 
     private SetupActionChooser setupActionChooser;
     
-    private final double kP = 0.5;
-    private final double kI = 0.05;
-    private final double kD = 0.1;
+    private final double kP = 0.1;
+    private final double kI = 0.0005;
+    private final double kD = 0.01;
     
     private final double kIz = 0;
     private final double kFF = 0;
@@ -112,7 +112,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-
+        frontLeftHome  = frontLeftLeg.getPosition();
+        frontRightHome = frontRightLeg.getPosition();
+        backLeftHome   = backLeftLeg.getPosition();
+        backRightHome  = backRightLeg.getPosition();
     }
     
     /**
@@ -124,6 +127,14 @@ public class Robot extends TimedRobot {
         double speedFactor = 1.0;
         double incrementOne = -speedFactor*joy.getRawAxis(1);
         double incrementTwo = speedFactor*joy.getRawAxis(5);
+
+        //Josytick BUFFER
+        if(Math.abs(incrementOne) <= 0.1){
+            incrementOne = 0.0;
+        }
+        if(Math.abs(incrementTwo) <= 0.1){
+            incrementTwo = 0.0;
+        }
 
         frontLeftPosition  = frontLeftLeg.getPosition();
         frontRightPosition = frontRightLeg.getPosition();
