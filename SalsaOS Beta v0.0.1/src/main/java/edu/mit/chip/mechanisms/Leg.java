@@ -24,7 +24,8 @@ public class Leg {
     double hingeMultiplier = 1.0;
     double kneeMultiplier = 1.0; 
 
-    public double[] home;
+    //public double[] home;
+    private LegPosition position;
 
     public enum JointType {
         SHOULDER,
@@ -72,8 +73,6 @@ public class Leg {
         if(knee_rev) {
             kneeMultiplier = -1.0;
         }
-
-        home = forwardsKinematics(new double[]{0.0,0.0,0.0});
     }
 
     public void loadPID(PIDConstants shoulderPID, PIDConstants hingePID, PIDConstants kneePID) {
@@ -134,12 +133,95 @@ public class Leg {
     FORWARDS KINEMATICS AND CONTROL CODE
     */
     public double[] getThetas() {
-        double theta_1 = getPosition(JointType.SHOULDER)*2*Math.PI/100.0;
-        double theta_2 = getPosition(JointType.HINGE)*2*Math.PI/100.0;
-        double theta_3 = getPosition(JointType.KNEE)*2*Math.PI/100.0;
+        double theta_1 = shoulderMultiplier*getPosition(JointType.SHOULDER)*2*Math.PI/100.0;
+        double theta_2 = hingeMultiplier*getPosition(JointType.HINGE)*2*Math.PI/100.0;
+        double theta_3 = kneeMultiplier*getPosition(JointType.KNEE)*2*Math.PI/100.0;
         return new double[]{theta_1, theta_2, theta_3};
     }
 
+    public double[] thetasToCMDS(double[] thetas) {
+        double cmd1 = shoulderMultiplier*thetas[0]*100.0/(2*Math.PI);
+        double cmd2 = hingeMultiplier*thetas[1]*100.0/(2*Math.PI);
+        double cmd3 = kneeMultiplier*thetas[2]*100.0/(2*Math.PI);
+        return new double[]{cmd1, cmd2, cmd3};
+    }
+
+    public double[] inverseKinematics(double xD, double yD, double zD) {
+        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
+
+        double rSquared = xD*xD+yD*yD;
+        double phi = Math.atan(yD/xD);
+        double theta3 = Math.acos((rSquared-l1*l1-l2*l2)/(-2.0*l1*l2));
+        double alpha = Math.acos((l2*l2-l1*l1-rSquared)/(-2.0*l1*Math.sqrt(rSquared)));
+        double theta1 = phi-alpha;
+        double theta2 = Math.asin(zD/yD);
+
+        return new double[]{theta1, theta2, theta3};
+    }
+
+    //WILL ALSO NEED A CURRENT LEG XYZ POS METHO (FORWARDS KINEMATICS)
+
+    // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
+    public void traverseTo(double xD, double yD, double zD, double speedMAX) {
+        double epsilon = 0.1;
+
+        double[] thetas = inverseKinematics(xD, yD, zD);
+        double[] CMDS = thetasToCMDS(thetas);
+
+        position = getPosition();
+
+        if (Math.abs(position.shoulder-CMDS[0])>epsilon) {
+            double speed;
+
+            if(Math.abs(CMDS[0]-position.shoulder)>speedMAX){
+                speed = speedMAX*Math.signum((CMDS[0]-position.shoulder));
+            }
+            else {
+                speed = (CMDS[0]-position.shoulder);
+            }
+
+            position.shoulder = position.shoulder+speed;
+        }
+        else {
+            position.shoulder=CMDS[0];
+        }
+
+        if (Math.abs(position.hinge-CMDS[1])>epsilon) {
+            double speed;
+
+            if(Math.abs(CMDS[1]-position.hinge)>speedMAX){
+                speed = speedMAX*Math.signum((CMDS[1]-position.hinge));
+            }
+            else {
+                speed = (CMDS[1]-position.hinge);
+            }
+
+            position.hinge = position.hinge+speed;
+        } 
+        else {
+            position.hinge = CMDS[1];
+        }
+
+        if (Math.abs(position.knee-CMDS[2])>epsilon) {
+            double speed;
+
+            if(Math.abs(CMDS[2]-position.knee)>speedMAX){
+                speed = speedMAX*Math.signum((CMDS[2]-position.knee));
+            }
+            else {
+                speed = (CMDS[2]-position.knee);
+            }
+
+            position.knee = position.knee+speed;
+        }
+        else{
+            position.knee = CMDS[2];
+        }
+
+        set(position);
+    }
+    /*
     public double[] forwardsKinematics(double[] thetas) {
         double theta_1 = thetas[0];
         double theta_2 = thetas[1];
@@ -152,6 +234,9 @@ public class Leg {
 
         return new double[]{xe, ye, ze};
     }
+    /*
+
+
     /*
     END CONTROL CODE
     */

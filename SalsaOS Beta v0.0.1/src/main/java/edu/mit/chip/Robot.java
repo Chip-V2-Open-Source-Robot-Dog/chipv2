@@ -57,9 +57,9 @@ public class Robot extends TimedRobot {
         double[] rightLeg = new double[]{0.055, -0.075, 0.235, 0.1, -0.03, 0.32};
                 
         frontLeftLeg  = new Leg(3, 2, 1, leftLeg, true, false, false);
-        frontRightLeg = new Leg(12, 10, 11, rightLeg, true, false, false);
-        backLeftLeg   = new Leg(4, 5, 6, leftLeg, false, false, true);
-        backRightLeg  = new Leg(9, 7, 8, rightLeg, false, false, true);
+        frontRightLeg = new Leg(12, 10, 11, rightLeg, false, true, true);
+        backLeftLeg   = new Leg(4, 5, 6, leftLeg, true, false, false);
+        backRightLeg  = new Leg(9, 7, 8, rightLeg, false, true, true);
         
         System.out.println("Legs constructed.");
         
@@ -115,7 +115,6 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-
     }
     
     /**
@@ -123,6 +122,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
+        frontLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
+        frontRightLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
+        backRightLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
+        /*
         // Get value of right joy y axis: joy.getRawAxis(5);
         double speedFactor = 2.0;
         double incrementOne = -speedFactor*joy.getRawAxis(1);
@@ -140,7 +143,7 @@ public class Robot extends TimedRobot {
         if(Math.abs(incrementThree) <= 0.1){
             incrementTwo = 0.0;
         }
-        */
+        
 
         frontLeftPosition  = frontLeftLeg.getPosition();
         frontRightPosition = frontRightLeg.getPosition();
@@ -167,6 +170,7 @@ public class Robot extends TimedRobot {
         frontRightLeg.set(frontRightPosition);
         backLeftLeg.set(backLeftPosition);
         backRightLeg.set(backRightPosition);
+        */
     }
     
     /**
