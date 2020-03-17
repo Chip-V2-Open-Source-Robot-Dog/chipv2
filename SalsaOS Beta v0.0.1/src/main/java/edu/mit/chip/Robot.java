@@ -115,6 +115,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
+        //PLACE SETUP CODE HERE
     }
     
     /**
@@ -125,52 +126,6 @@ public class Robot extends TimedRobot {
         frontLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
         frontRightLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
         backRightLeg.traverseTo(0.0, 0.45, 0.0, 0.25);
-        /*
-        // Get value of right joy y axis: joy.getRawAxis(5);
-        double speedFactor = 2.0;
-        double incrementOne = -speedFactor*joy.getRawAxis(1);
-        double incrementTwo = speedFactor*joy.getRawAxis(5);
-        //double incrementThree = joy.getRawAxis(4);
-
-        //Josytick BUFFER
-        if(Math.abs(incrementOne) <= 0.1){
-            incrementOne = 0.0;
-        }
-        if(Math.abs(incrementTwo) <= 0.1){
-            incrementTwo = 0.0;
-        }
-        /*
-        if(Math.abs(incrementThree) <= 0.1){
-            incrementTwo = 0.0;
-        }
-        
-
-        frontLeftPosition  = frontLeftLeg.getPosition();
-        frontRightPosition = frontRightLeg.getPosition();
-        backLeftPosition   = backLeftLeg.getPosition();
-        backRightPosition  = backRightLeg.getPosition();
-
-        frontLeftPosition.shoulder = frontLeftPosition.shoulder+incrementOne;
-        frontLeftPosition.knee = frontLeftPosition.knee-2.0*incrementTwo;
-        //frontLeftPosition.hinge = frontLeftPosition.hinge+incrementThree/4.0;
-
-        frontRightPosition.shoulder = frontRightPosition.shoulder-incrementOne;
-        frontRightPosition.knee = frontRightPosition.knee+2.0*incrementTwo;
-        //frontRightPosition.hinge = frontRightPosition.hinge+incrementThree/4.0;
-
-        backLeftPosition.shoulder = backLeftPosition.shoulder+incrementOne;
-        backLeftPosition.knee = backLeftPosition.knee-2.0*incrementTwo;
-        //backLeftPosition.hinge = backLeftPosition.hinge+incrementThree/4.0;
-
-        backRightPosition.shoulder = backRightPosition.shoulder-incrementOne;
-        backRightPosition.knee = backRightPosition.knee+2.0*incrementTwo;
-        //backRightPosition.hinge = backRightPosition.hinge+incrementThree/4.0;
-
-        frontLeftLeg.set(frontLeftPosition);
-        frontRightLeg.set(frontRightPosition);
-        backLeftLeg.set(backLeftPosition);
-        backRightLeg.set(backRightPosition);
-        */
     }
     
     /**
