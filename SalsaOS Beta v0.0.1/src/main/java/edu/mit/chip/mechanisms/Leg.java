@@ -24,7 +24,7 @@ public class Leg {
     double hingeMultiplier = 1.0;
     double kneeMultiplier = 1.0; 
 
-    //public double[] home;
+    public double[] home;
     private LegPosition position;
 
     public enum JointType {
@@ -51,6 +51,8 @@ public class Leg {
         shoulder =  new CANSparkMax(shoulderID, MotorType.kBrushless);
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
+
+        home = new double[]{L3-L6, 0.0, 0.0};
 
         if(model.length==6) {
             L1 = model[0];
