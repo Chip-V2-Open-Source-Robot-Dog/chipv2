@@ -116,13 +116,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         //PLACE SETUP CODE HERE
-        frontLeftLeg.addPoint(0.0, 0.45, 0.0);
-        frontLeftLeg.addPoint(0.1, 0.45, 0.0);
-        frontLeftLeg.addPoint(0.1, 0.35, 0.0);
-        frontLeftLeg.addPoint(0.0, 0.35, 0.0);
-        frontLeftLeg.addPoint(-0.1, 0.35, 0.0);
-        frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
-        frontLeftLeg.addPoint(0.0, 0.45, 0.0);
     }
     
     /**
@@ -130,7 +123,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.move(0.5);
+        frontLeftLeg.executeCMD(frontLeftLeg.homeCMD, 0.5);
     }
     
     /**

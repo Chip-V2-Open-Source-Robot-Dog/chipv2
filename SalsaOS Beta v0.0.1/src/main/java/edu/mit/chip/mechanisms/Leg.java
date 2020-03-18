@@ -192,14 +192,15 @@ public class Leg {
 
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
-        double epsilon = 0.1;
         double[] thetas = inverseKinematics(xD, yD, zD);
         double[] CMDS = thetasToCMDS(thetas);
-        
-        return executeCMD(CMDS);
+        boolean there = executeCMD(CMDS, speedMAX);
+        //need to tell the other methods we've arrived at the point
+        return there;
     }
 
-    public boolean executeCMD(double[] CMDS) {
+    public boolean executeCMD(double[] CMDS, double speedMAX) {
+        double epsilon = 0.1;
         boolean shoulderThere = false;
         boolean hingeThere = false;
         boolean kneeThere = false; 
