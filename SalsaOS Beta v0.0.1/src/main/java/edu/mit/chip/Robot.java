@@ -123,7 +123,11 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.executeCMD(frontLeftLeg.homeCMD, 0.5);
+        //frontLeftLeg.executeCMD(frontLeftLeg.homeCMD, 0.5);
+        frontLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
+        frontRightLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
+        backLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
+        backRightLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
     }
     
     /**
