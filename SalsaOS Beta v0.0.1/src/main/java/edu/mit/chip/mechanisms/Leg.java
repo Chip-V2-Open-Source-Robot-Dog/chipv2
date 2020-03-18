@@ -258,8 +258,6 @@ public class Leg {
     }
 
     public void move(double speedMAX){
-        double epsilon = 0.1;
-
         //if there's a trajectory we will be following that
         if (trajectory.size()>0) {
             //get the point we want to go to
