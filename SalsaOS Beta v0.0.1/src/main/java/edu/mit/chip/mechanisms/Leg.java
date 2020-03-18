@@ -193,13 +193,16 @@ public class Leg {
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
         double epsilon = 0.1;
         double[] thetas = inverseKinematics(xD, yD, zD);
+        double[] CMDS = thetasToCMDS(thetas);
+        
+        return command(CMDS);
+    }
 
+    public boolean command(double[] CMDS) {
         boolean shoulderThere = false;
         boolean hingeThere = false;
         boolean kneeThere = false; 
-
-        double[] CMDS = thetasToCMDS(thetas);
-
+        
         position = getPosition();
 
         if (Math.abs(position.shoulder-CMDS[0])>epsilon) {
