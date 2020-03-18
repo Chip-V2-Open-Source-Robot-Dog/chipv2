@@ -22,10 +22,10 @@ public class Leg {
 
     double shoulderMultiplier = 1.0;
     double hingeMultiplier = 1.0;
-    double kneeMultiplier = 1.0; 
+    double kneeMultiplier = 1.0;
 
-    public double[] home;
     private LegPosition position;
+    private ArrayList<double[]> trajectory;
 
     public enum JointType {
         SHOULDER,
@@ -52,7 +52,7 @@ public class Leg {
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
 
-        home = new double[]{L3-L6, 0.0, 0.0};
+        trajectory = new ArrayList();
 
         if(model.length==6) {
             L1 = model[0];
@@ -134,6 +134,20 @@ public class Leg {
     /*
     FORWARDS KINEMATICS AND CONTROL CODE
     */
+
+    public boolean addPoint(double xD, double yD, double zD) {
+        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
+        double r = Math.sqrt(xD*xD+yD*yD);
+
+        //checks if the point has a solution in IK
+        if(checkValidity(l1, l2, r)) {
+            trajectory.add(new double[]{xD, yD, zD});
+            return true;
+        }
+        return false; 
+    }
+
     public double[] getThetas() {
         double theta_1 = shoulderMultiplier*getPosition(JointType.SHOULDER)*2*Math.PI/100.0;
         double theta_2 = hingeMultiplier*getPosition(JointType.HINGE)*2*Math.PI/100.0;
@@ -153,7 +167,7 @@ public class Leg {
         double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
 
         double rSquared = xD*xD+yD*yD;
-        double phi = Math.atan(yD/xD);
+        double phi = Math.atan2(yD, xD);
         double theta3 = Math.acos((rSquared-l1*l1-l2*l2)/(-2.0*l1*l2));
         double alpha = Math.acos((l2*l2-l1*l1-rSquared)/(-2.0*l1*Math.sqrt(rSquared)));
         double theta1 = phi-alpha;
@@ -163,12 +177,27 @@ public class Leg {
     }
 
     //WILL ALSO NEED A CURRENT LEG XYZ POS METHO (FORWARDS KINEMATICS)
+    public double[] whereIs() {
+        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
+        double[] thetas = getThetas();
+
+        double xe = l1*Math.cos(thetas[0])-l2*Math.cos(thetas[2]-thetas[0]);
+        double ye = l1*Math.sin(thetas[0])+l2*Math.sin(thetas[2]-thetas[0]);
+        double ze = ye*Math.sin(thetas[1]);
+
+        return new double[]{xe, ye, ze};
+    }
 
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
-    public void traverseTo(double xD, double yD, double zD, double speedMAX) {
+    public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
         double epsilon = 0.1;
-
         double[] thetas = inverseKinematics(xD, yD, zD);
+
+        boolean shoulderThere = false;
+        boolean hingeThere = false;
+        boolean kneeThere = false; 
+
         double[] CMDS = thetasToCMDS(thetas);
 
         position = getPosition();
@@ -187,6 +216,7 @@ public class Leg {
         }
         else {
             position.shoulder=CMDS[0];
+            shoulderThere = true;
         }
 
         if (Math.abs(position.hinge-CMDS[1])>epsilon) {
@@ -203,6 +233,7 @@ public class Leg {
         } 
         else {
             position.hinge = CMDS[1];
+            hingeThere = true;
         }
 
         if (Math.abs(position.knee-CMDS[2])>epsilon) {
@@ -219,9 +250,32 @@ public class Leg {
         }
         else{
             position.knee = CMDS[2];
+            kneeThere = true;
         }
 
         set(position);
+        return shoulderThere && hingeThere && kneeThere;
+    }
+
+    public void move(double speedMAX){
+        double epsilon = 0.1;
+
+        //if there's a trajectory we will be following that
+        if (trajectory.size()>0) {
+            //get the point we want to go to
+            double[] desired = trajectory.get(0);
+            //go to that point
+            boolean there = traverseTo(desired[0], desired[1], desired[2], speedMAX);
+            //only if we have reached that point, should we be telling the leg to go to the next point 
+            if (there) {
+                trajectory.remove(0);
+            }
+        }
+        //otherwise we will be staying still
+        else{
+            position = getPosition();
+            set(position);
+        }
     }
     /*
     public double[] forwardsKinematics(double[] thetas) {
@@ -251,4 +305,17 @@ public class Leg {
         SmartDashboard.putNumber(name + " - Hinge Position", getPosition(JointType.HINGE));
         SmartDashboard.putNumber(name + " - Knee Position", getPosition(JointType.KNEE));
     }
+
+
+
+
+
+
+    public static boolean checkValidity(double a, double b, double c) { 
+        // check condition 
+        if (a + b <= c || a + c <= b || b + c <= a) 
+            return false; 
+        else
+            return true; 
+    } 
 }
