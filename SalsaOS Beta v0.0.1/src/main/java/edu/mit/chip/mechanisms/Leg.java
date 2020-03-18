@@ -26,6 +26,7 @@ public class Leg {
 
     private LegPosition position;
     private ArrayList<double[]> trajectory;
+    public double[] homeCMD = new double[]{0.0, 0.0, 0.0};
 
     public enum JointType {
         SHOULDER,
@@ -195,14 +196,14 @@ public class Leg {
         double[] thetas = inverseKinematics(xD, yD, zD);
         double[] CMDS = thetasToCMDS(thetas);
         
-        return command(CMDS);
+        return executeCMD(CMDS);
     }
 
-    public boolean command(double[] CMDS) {
+    public boolean executeCMD(double[] CMDS) {
         boolean shoulderThere = false;
         boolean hingeThere = false;
         boolean kneeThere = false; 
-        
+
         position = getPosition();
 
         if (Math.abs(position.shoulder-CMDS[0])>epsilon) {
