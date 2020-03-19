@@ -124,14 +124,6 @@ public class Leg {
         return 0;
     }
 
-    public LegPosition calculateLegPosition(double shoulderTheta, double hingeTheta, double kneeTheta) {
-        double shoulderPos = RobotMath.calculateEncoderTicks(shoulderTheta);
-        double hingePos = RobotMath.calculateEncoderTicks(hingeTheta);
-        double kneePos = RobotMath.calculateEncoderTicks(kneeTheta);
-
-        return new LegPosition(shoulderPos, hingePos, kneePos);
-    }
-
     /*
     INVERSE AND FORWARDS KINEMATICS CONTROLS CODE 
     */
@@ -169,7 +161,7 @@ public class Leg {
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
         double[] thetas = inverseKinematics(xD, yD, zD);
-        LegPosition targetPosition = calculateLegPosition(thetas[0], thetas[1], thetas[2]);
+        LegPosition targetPosition = RobotMath.calculateLegPosition(thetas[0], thetas[1], thetas[2]);
         boolean there = executeCMD(targetPosition, speedMAX);
         //need to tell the other methods we've arrived at the point
         return there;
