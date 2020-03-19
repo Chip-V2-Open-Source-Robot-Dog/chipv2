@@ -249,7 +249,7 @@ public class Leg {
         double r = Math.sqrt(xD*xD+yD*yD);
 
         //checks if the point has a solution in IK
-        if(checkValidity(l1, l2, r)) {
+        if (RobotMath.makesValidTriangle(l1, l2, r)) {
             trajectory.add(new double[]{xD, yD, zD});
             return true;
         }
@@ -291,14 +291,4 @@ public class Leg {
         SmartDashboard.putNumber(name + " - Hinge Position", getPosition(JointType.HINGE));
         SmartDashboard.putNumber(name + " - Knee Position", getPosition(JointType.KNEE));
     }
-
-
-
-
-
-
-    public static boolean checkValidity(double a, double b, double c) { 
-        // check condition 
-        return (a + b <= c || a + c <= b || b + c <= a);
-    } 
 }

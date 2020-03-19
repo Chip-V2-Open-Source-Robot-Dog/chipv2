@@ -16,4 +16,8 @@ public class RobotMath {
     public static double calculateTheta(double encoderPosition) {
         return encoderPosition * (2*Math.PI)/100.0;
     }
+
+    public static boolean makesValidTriangle(double a, double b, double c) { 
+        return (a + b <= c || a + c <= b || b + c <= a);
+    } 
 }
