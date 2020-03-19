@@ -87,7 +87,7 @@ public class Leg {
     }
 
     public void set(LegPosition legPosition) {
-        set(MotorControlType.POSITION, legPosition.shoulder, legPosition.hinge, legPosition.knee);
+        set(MotorControlType.POSITION, reversal.shoulderMult * legPosition.shoulder, reversal.hingeMult * legPosition.hinge, reversal.kneeMult * legPosition.knee);
     }
 
     public LegPosition getPosition() {
@@ -125,9 +125,9 @@ public class Leg {
     }
 
     public LegPosition calculateLegPosition(double shoulderTheta, double hingeTheta, double kneeTheta) {
-        double shoulderPos = reversal.shoulderMult * RobotMath.calculateEncoderTicks(shoulderTheta);
-        double hingePos = reversal.hingeMult * RobotMath.calculateEncoderTicks(hingeTheta);
-        double kneePos = reversal.kneeMult * RobotMath.calculateEncoderTicks(kneeTheta);
+        double shoulderPos = RobotMath.calculateEncoderTicks(shoulderTheta);
+        double hingePos = RobotMath.calculateEncoderTicks(hingeTheta);
+        double kneePos = RobotMath.calculateEncoderTicks(kneeTheta);
 
         return new LegPosition(shoulderPos, hingePos, kneePos);
     }
