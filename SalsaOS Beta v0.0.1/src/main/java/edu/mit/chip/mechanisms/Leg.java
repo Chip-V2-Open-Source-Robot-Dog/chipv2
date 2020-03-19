@@ -4,15 +4,17 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
+import edu.mit.chip.utils.LegReversal;
 import edu.mit.chip.utils.PIDConstants;
+import edu.mit.chip.utils.RobotMath;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Arrays;
 import java.util.ArrayList;
 
 public class Leg {
-
     double L1;
     double L2;
     double L3;
@@ -20,13 +22,11 @@ public class Leg {
     double L5;
     double L6;
 
-    double shoulderMultiplier = 1.0;
-    double hingeMultiplier = 1.0;
-    double kneeMultiplier = 1.0;
+    public LegReversal reversal;
 
     private LegPosition position;
     private ArrayList<double[]> trajectory;
-    public double[] homeCMD = new double[]{0.0, 0.0, 0.0};
+    public LegPosition homeCMD = new LegPosition(0.0, 0.0, 0.0);
 
     public enum JointType {
         SHOULDER,
@@ -48,7 +48,7 @@ public class Leg {
 
     public CANSparkMax shoulder, hinge, knee;
 
-    public Leg(int shoulderID, int hingeID, int kneeID, double[] model, boolean shoulder_rev, boolean hinge_rev, boolean knee_rev) {
+    public Leg(int shoulderID, int hingeID, int kneeID, double[] model, boolean revShoulder, boolean revHinge, boolean revKnee) {
         shoulder =  new CANSparkMax(shoulderID, MotorType.kBrushless);
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
@@ -67,15 +67,7 @@ public class Leg {
             throw new IllegalArgumentException("WARNING: Leg model does not match internal model. Too many or too few arguments!");
         }
 
-        if(shoulder_rev) {
-            shoulderMultiplier = -1.0;
-        }
-        if(hinge_rev) {
-            hingeMultiplier = -1.0;
-        }
-        if(knee_rev) {
-            kneeMultiplier = -1.0;
-        }
+        reversal = new LegReversal(revShoulder, revHinge, revKnee);
     }
 
     public void loadPID(PIDConstants shoulderPID, PIDConstants hingePID, PIDConstants kneePID) {
@@ -111,11 +103,11 @@ public class Leg {
     public double getPosition(JointType joint) {
         switch (joint) {
             case SHOULDER:
-                return shoulder.getEncoder().getPosition();
+                return reversal.shoulderMult * shoulder.getEncoder().getPosition();
             case HINGE:
-                return hinge.getEncoder().getPosition();
+                return reversal.hingeMult * hinge.getEncoder().getPosition();
             case KNEE:
-                return knee.getEncoder().getPosition();
+                return reversal.kneeMult * knee.getEncoder().getPosition();
         }
         return 0;
     }
@@ -123,30 +115,21 @@ public class Leg {
     public double getVelocity(JointType joint) {
         switch (joint) {
             case SHOULDER:
-                return shoulder.getEncoder().getVelocity();
+                return reversal.shoulderMult * shoulder.getEncoder().getVelocity();
             case HINGE:
-                return hinge.getEncoder().getVelocity();
+                return reversal.hingeMult * hinge.getEncoder().getVelocity();
             case KNEE:
-                return knee.getEncoder().getVelocity();
+                return reversal.kneeMult * knee.getEncoder().getVelocity();
         }
         return 0;
     }
 
-    /*
-    CONVERSION FROM THETAS TO TO COMMANDS AND COMMANDS TO THETAS
-    */
-    public double[] getThetas() {
-        double theta_1 = shoulderMultiplier*getPosition(JointType.SHOULDER)*2*Math.PI/100.0;
-        double theta_2 = hingeMultiplier*getPosition(JointType.HINGE)*2*Math.PI/100.0;
-        double theta_3 = kneeMultiplier*getPosition(JointType.KNEE)*2*Math.PI/100.0;
-        return new double[]{theta_1, theta_2, theta_3};
-    }
+    public LegPosition calculateLegPosition(double shoulderTheta, double hingeTheta, double kneeTheta) {
+        double shoulderPos = reversal.shoulderMult * RobotMath.calculateEncoderTicks(shoulderTheta);
+        double hingePos = reversal.hingeMult * RobotMath.calculateEncoderTicks(hingeTheta);
+        double kneePos = reversal.kneeMult * RobotMath.calculateEncoderTicks(kneeTheta);
 
-    public double[] thetasToCMDS(double[] thetas) {
-        double cmd1 = shoulderMultiplier*thetas[0]*100.0/(2*Math.PI);
-        double cmd2 = hingeMultiplier*thetas[1]*100.0/(2*Math.PI);
-        double cmd3 = kneeMultiplier*thetas[2]*100.0/(2*Math.PI);
-        return new double[]{cmd1, cmd2, cmd3};
+        return new LegPosition(shoulderPos, hingePos, kneePos);
     }
 
     /*
@@ -166,23 +149,27 @@ public class Leg {
         return new double[]{theta1, theta2, theta3};
     }
 
-    //WILL ALSO NEED A CURRENT LEG XYZ POS METHO (FORWARDS KINEMATICS)
-    public double[] whereIS() {
+    //WILL ALSO NEED A CURRENT LEG XYZ POS METHOD (FORWARDS KINEMATICS)
+    public FootPosition getFootPosition() {
         double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
         double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
-        double[] thetas = getThetas();
+        LegPosition currentPosition = getPosition();
 
-        double xe = l1*Math.cos(thetas[0])-l2*Math.cos(thetas[2]-thetas[0]);
-        double ye = l1*Math.sin(thetas[0])+l2*Math.sin(thetas[2]-thetas[0]);
-        double ze = ye*Math.sin(thetas[1]);
+        double shoulderTheta = RobotMath.calculateTheta(currentPosition.shoulder);
+        double hingeTheta = RobotMath.calculateTheta(currentPosition.hinge);
+        double kneeTheta = RobotMath.calculateTheta(currentPosition.knee);
 
-        return new double[]{xe, ye, ze};
+        double xe = l1*Math.cos(shoulderTheta)-l2*Math.cos(kneeTheta-shoulderTheta);
+        double ye = l1*Math.sin(shoulderTheta)+l2*Math.sin(kneeTheta-shoulderTheta);
+        double ze = ye*Math.sin(hingeTheta);
+
+        return new FootPosition(xe, ye, ze);
     }
 
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
         double[] thetas = inverseKinematics(xD, yD, zD);
-        double[] CMDS = thetasToCMDS(thetas);
+        LegPosition CMDS = new LegPosition(RobotMath.calculateEncoderTicks(thetas[0]), RobotMath.calculateEncoderTicks(thetas[1]), RobotMath.calculateEncoderTicks(thetas[2]));
         boolean there = executeCMD(CMDS, speedMAX);
         //need to tell the other methods we've arrived at the point
         return there;
@@ -196,7 +183,9 @@ public class Leg {
     /*
     COMMAND EXECUTION CODE - PID ARBITRATION/SATURATION SYSTEM 
     */
-    public boolean executeCMD(double[] CMDS, double speedMAX) {
+    public boolean executeCMD(LegPosition targetPosition, double speedMAX) {
+        double[] CMDS = {targetPosition.shoulder, targetPosition.hinge, targetPosition.knee};
+
         double epsilon = 0.1;
         boolean shoulderThere = false;
         boolean hingeThere = false;
@@ -318,9 +307,6 @@ public class Leg {
 
     public static boolean checkValidity(double a, double b, double c) { 
         // check condition 
-        if (a + b <= c || a + c <= b || b + c <= a) 
-            return false; 
-        else
-            return true; 
+        return (a + b <= c || a + c <= b || b + c <= a);
     } 
 }
