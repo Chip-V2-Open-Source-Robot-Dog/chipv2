@@ -116,6 +116,28 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         //PLACE SETUP CODE HERE
+        frontLeftLeg.clearTrajectory();
+        frontRightLeg.clearTrajectory();
+        backLeftLeg.clearTrajectory();
+        backRightLeg.clearTrajectory();
+
+        /*
+        frontRightLeg.addPoint(0.0, 0.40, 0.0);
+        backLeftLeg.addPoint(0.0, 0.45, 0.0);
+        backRightLeg.addPoint(0.0, 0.35, 0.0);
+        */
+
+        //PRETTY GOOD "STAND UP"
+        
+        frontLeftLeg.addPoint(0.0, 0.2, 0.0);
+        frontRightLeg.addPoint(0.0, 0.2, 0.0);
+        backLeftLeg.addPoint(0.05, 0.2, 0.0);
+        backRightLeg.addPoint(0.05, 0.2, 0.0);
+        frontLeftLeg.addPoint(0.0, 0.47, 0.0);
+        frontRightLeg.addPoint(0.0, 0.47, 0.0);
+        backLeftLeg.addPoint(0.05, 0.5, 0.0);
+        backRightLeg.addPoint(0.05, 0.5, 0.0);
+        
     }
     
     /**
@@ -123,11 +145,17 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        //frontLeftLeg.executeCMD(frontLeftLeg.homeCMD, 0.5);
-        frontLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
-        frontRightLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
-        backLeftLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
-        backRightLeg.traverseTo(0.0, 0.45, 0.0, 0.5);
+        frontLeftLeg.move(0.5);
+        frontRightLeg.move(0.5);
+        backLeftLeg.move(0.5);
+        backRightLeg.move(0.5);
+
+        /*
+        frontLeftLeg.home(0.5);
+        frontRightLeg.home(0.5);
+        backLeftLeg.home(0.5);
+        backRightLeg.home(0.5);
+        */
     }
     
     /**

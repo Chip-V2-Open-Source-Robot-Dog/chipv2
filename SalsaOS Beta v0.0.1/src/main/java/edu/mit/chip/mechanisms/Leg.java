@@ -133,22 +133,8 @@ public class Leg {
     }
 
     /*
-    FORWARDS KINEMATICS AND CONTROL CODE
+    CONVERSION FROM THETAS TO TO COMMANDS AND COMMANDS TO THETAS
     */
-
-    public boolean addPoint(double xD, double yD, double zD) {
-        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
-        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
-        double r = Math.sqrt(xD*xD+yD*yD);
-
-        //checks if the point has a solution in IK
-        if(checkValidity(l1, l2, r)) {
-            trajectory.add(new double[]{xD, yD, zD});
-            return true;
-        }
-        return false; 
-    }
-
     public double[] getThetas() {
         double theta_1 = shoulderMultiplier*getPosition(JointType.SHOULDER)*2*Math.PI/100.0;
         double theta_2 = hingeMultiplier*getPosition(JointType.HINGE)*2*Math.PI/100.0;
@@ -163,6 +149,9 @@ public class Leg {
         return new double[]{cmd1, cmd2, cmd3};
     }
 
+    /*
+    INVERSE AND FORWARDS KINEMATICS CONTROLS CODE 
+    */
     public double[] inverseKinematics(double xD, double yD, double zD) {
         double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
         double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
@@ -178,7 +167,7 @@ public class Leg {
     }
 
     //WILL ALSO NEED A CURRENT LEG XYZ POS METHO (FORWARDS KINEMATICS)
-    public double[] whereIs() {
+    public double[] whereIS() {
         double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
         double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
         double[] thetas = getThetas();
@@ -199,6 +188,14 @@ public class Leg {
         return there;
     }
 
+    //SENDS LEG TO HOME POSITION
+    public void home(double speedMAX) {
+        executeCMD(homeCMD, speedMAX);
+    }
+
+    /*
+    COMMAND EXECUTION CODE - PID ARBITRATION/SATURATION SYSTEM 
+    */
     public boolean executeCMD(double[] CMDS, double speedMAX) {
         double epsilon = 0.1;
         boolean shoulderThere = false;
@@ -262,6 +259,26 @@ public class Leg {
         return shoulderThere && hingeThere && kneeThere;
     }
 
+    /*
+    CODE INVOVLING TRAJECTORY GENERATION, CLEARING, AND EXECUTION 
+    */
+    public boolean addPoint(double xD, double yD, double zD) {
+        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
+        double r = Math.sqrt(xD*xD+yD*yD);
+
+        //checks if the point has a solution in IK
+        if(checkValidity(l1, l2, r)) {
+            trajectory.add(new double[]{xD, yD, zD});
+            return true;
+        }
+        return false; 
+    }
+
+    public void clearTrajectory() {
+        trajectory = new ArrayList();
+    }
+
     public void move(double speedMAX){
         //if there's a trajectory we will be following that
         if (trajectory.size()>0) {
@@ -280,21 +297,6 @@ public class Leg {
             set(position);
         }
     }
-    /*
-    public double[] forwardsKinematics(double[] thetas) {
-        double theta_1 = thetas[0];
-        double theta_2 = thetas[1];
-        double theta_3 = thetas[2];
-
-        //IMPORTED MATLAB MODEL
-        double xe =  L5*(Math.cos(theta_1)*Math.sin(theta_3) + Math.cos(theta_2)*Math.cos(theta_3)*Math.sin(theta_1)) - L6*(Math.cos(theta_1)*Math.cos(theta_3) - Math.cos(theta_2)*Math.sin(theta_1)*Math.sin(theta_3)) + L3*Math.cos(theta_1) + L2*Math.sin(theta_1) + L4*Math.sin(theta_1)*Math.sin(theta_2);
-        double ye =  L5*(Math.sin(theta_1)*Math.sin(theta_3) - Math.cos(theta_1)*Math.cos(theta_2)*Math.cos(theta_3)) - L6*(Math.cos(theta_3)*Math.sin(theta_1) + Math.cos(theta_1)*Math.cos(theta_2)*Math.sin(theta_3)) - L2*Math.cos(theta_1) + L3*Math.sin(theta_1) - L4*Math.cos(theta_1)*Math.sin(theta_2);
-        double ze =  L1 + L4*Math.cos(theta_2) - L5*Math.cos(theta_3)*Math.sin(theta_2) - L6*Math.sin(theta_2)*Math.sin(theta_3);
-
-        return new double[]{xe, ye, ze};
-    }
-    /*
-
 
     /*
     END CONTROL CODE
