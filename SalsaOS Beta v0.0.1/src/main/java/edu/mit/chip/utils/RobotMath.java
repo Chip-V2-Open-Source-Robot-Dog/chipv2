@@ -18,6 +18,6 @@ public class RobotMath {
     }
 
     public static boolean makesValidTriangle(double a, double b, double c) { 
-        return (a + b <= c || a + c <= b || b + c <= a);
+        return !(a + b <= c || a + c <= b || b + c <= a);
     } 
 }
