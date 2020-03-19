@@ -133,6 +133,7 @@ public class Robot extends TimedRobot {
         frontRightLeg.addPoint(0.0, 0.2, 0.0);
         backLeftLeg.addPoint(0.05, 0.2, 0.0);
         backRightLeg.addPoint(0.05, 0.2, 0.0);
+        
         frontLeftLeg.addPoint(0.0, 0.47, 0.0);
         frontRightLeg.addPoint(0.0, 0.47, 0.0);
         backLeftLeg.addPoint(0.05, 0.5, 0.0);

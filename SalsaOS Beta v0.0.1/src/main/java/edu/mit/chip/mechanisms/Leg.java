@@ -169,8 +169,8 @@ public class Leg {
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
         double[] thetas = inverseKinematics(xD, yD, zD);
-        LegPosition CMDS = new LegPosition(RobotMath.calculateEncoderTicks(thetas[0]), RobotMath.calculateEncoderTicks(thetas[1]), RobotMath.calculateEncoderTicks(thetas[2]));
-        boolean there = executeCMD(CMDS, speedMAX);
+        LegPosition targetPosition = calculateLegPosition(thetas[0], thetas[1], thetas[2]);
+        boolean there = executeCMD(targetPosition, speedMAX);
         //need to tell the other methods we've arrived at the point
         return there;
     }
