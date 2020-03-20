@@ -9,9 +9,9 @@ import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.LegReversal;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.RobotMath;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 
 public class Leg {

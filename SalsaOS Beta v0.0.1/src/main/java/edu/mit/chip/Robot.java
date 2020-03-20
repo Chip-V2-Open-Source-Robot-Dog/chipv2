@@ -8,8 +8,10 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
+import edu.mit.chip.moveactions.CmdMoveRobot;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
+import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
 
@@ -115,11 +117,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        //PLACE SETUP CODE HERE
-        frontLeftLeg.clearTrajectory();
-        frontRightLeg.clearTrajectory();
-        backLeftLeg.clearTrajectory();
-        backRightLeg.clearTrajectory();
+        // frontLeftLeg.clearTrajectory();
+        // frontRightLeg.clearTrajectory();
+        // backLeftLeg.clearTrajectory();
+        // backRightLeg.clearTrajectory();
 
         /*
         frontRightLeg.addPoint(0.0, 0.40, 0.0);
@@ -129,15 +130,30 @@ public class Robot extends TimedRobot {
 
         //PRETTY GOOD "STAND UP"
         
-        frontLeftLeg.addPoint(0.0, 0.2, 0.0);
-        frontRightLeg.addPoint(0.0, 0.2, 0.0);
-        backLeftLeg.addPoint(0.05, 0.2, 0.0);
-        backRightLeg.addPoint(0.05, 0.2, 0.0);
+        // frontLeftLeg.addPoint(0.0, 0.2, 0.0);
+        // frontRightLeg.addPoint(0.0, 0.2, 0.0);
+        // backLeftLeg.addPoint(0.05, 0.2, 0.0);
+        // backRightLeg.addPoint(0.05, 0.2, 0.0);
         
-        frontLeftLeg.addPoint(0.0, 0.47, 0.0);
-        frontRightLeg.addPoint(0.0, 0.47, 0.0);
-        backLeftLeg.addPoint(0.05, 0.5, 0.0);
-        backRightLeg.addPoint(0.05, 0.5, 0.0);
+        // frontLeftLeg.addPoint(0.0, 0.47, 0.0);
+        // frontRightLeg.addPoint(0.0, 0.47, 0.0);
+        // backLeftLeg.addPoint(0.05, 0.5, 0.0);
+        // backRightLeg.addPoint(0.05, 0.5, 0.0);
+
+        // maybe works stand up
+        Scheduler.getInstance().add(new CmdMoveRobot(this,
+                new FootPosition(0.0,  0.2, 0.0), 0.5,
+                new FootPosition(0.0,  0.2, 0.0), 0.5,
+                new FootPosition(0.05, 0.2, 0.0), 0.5,
+                new FootPosition(0.05, 0.2, 0.0), 0.5
+        ));
+
+        Scheduler.getInstance().add(new CmdMoveRobot(this,
+                new FootPosition(0.0,  0.47, 0.0), 0.5,
+                new FootPosition(0.0,  0.47, 0.0), 0.5,
+                new FootPosition(0.05, 0.5,  0.0), 0.5,
+                new FootPosition(0.05, 0.5,  0.0), 0.5
+        ));
         
     }
     
@@ -146,10 +162,12 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.move(0.5);
-        frontRightLeg.move(0.5);
-        backLeftLeg.move(0.5);
-        backRightLeg.move(0.5);
+        Scheduler.getInstance().run();
+
+        // frontLeftLeg.move(0.5);
+        // frontRightLeg.move(0.5);
+        // backLeftLeg.move(0.5);
+        // backRightLeg.move(0.5);
 
         /*
         frontLeftLeg.home(0.5);
@@ -182,11 +200,11 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        Scheduler.getInstance().removeAll();
+
         frontLeftLeg.neutral();
         frontRightLeg.neutral();
         backLeftLeg.neutral();
         backRightLeg.neutral();
-
-        Scheduler.getInstance().removeAll();
     }
 }
