@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 
 import edu.wpi.first.wpilibj.Joystick;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
 * The VM is configured to automatically run this class, and to call the
 * functions corresponding to each mode, as described in the TimedRobot
@@ -121,24 +123,9 @@ public class Robot extends TimedRobot {
         backLeftLeg.clearTrajectory();
         backRightLeg.clearTrajectory();
 
-        /*
-        frontRightLeg.addPoint(0.0, 0.40, 0.0);
-        backLeftLeg.addPoint(0.0, 0.45, 0.0);
-        backRightLeg.addPoint(0.0, 0.35, 0.0);
-        */
-
-        //PRETTY GOOD "STAND UP"
-        
-        frontLeftLeg.addPoint(0.0, 0.2, 0.0);
-        frontRightLeg.addPoint(0.0, 0.2, 0.0);
-        backLeftLeg.addPoint(0.05, 0.2, 0.0);
-        backRightLeg.addPoint(0.05, 0.2, 0.0);
-        
-        frontLeftLeg.addPoint(0.0, 0.47, 0.0);
-        frontRightLeg.addPoint(0.0, 0.47, 0.0);
-        backLeftLeg.addPoint(0.05, 0.5, 0.0);
-        backRightLeg.addPoint(0.05, 0.5, 0.0);
-        
+        SmartDashboard.putNumber("X", 0.0);
+        SmartDashboard.putNumber("Y", 0.0);
+        SmartDashboard.putNumber("Z", 0.0);
     }
     
     /**
@@ -146,9 +133,25 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
+        System.out.println(joy.getRawButton(1));
+        if (joy.getRawButton(1)) {
+            frontLeftLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
+        }
+        /* DISABLES UNTIL LEG IS HEALTHY AGAIN 
+        if (joy.getRawButton(2)) {
+            backLeftLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
+        }
+        */
+        if (joy.getRawButton(3)) {
+            frontRightLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
+        }
+        if (joy.getRawButton(4)) {
+            backRightLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
+        }
+
         frontLeftLeg.move(0.5);
         frontRightLeg.move(0.5);
-        backLeftLeg.move(0.5);
+        //backLeftLeg.move(0.5);
         backRightLeg.move(0.5);
 
         /*
