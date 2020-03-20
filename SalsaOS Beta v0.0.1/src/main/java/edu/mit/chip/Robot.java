@@ -16,8 +16,8 @@ import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Scheduler;
-
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
@@ -141,19 +141,20 @@ public class Robot extends TimedRobot {
         // backRightLeg.addPoint(0.05, 0.5, 0.0);
 
         // maybe works stand up
-        Scheduler.getInstance().add(new CmdMoveRobot(this,
-                new FootPosition(0.0,  0.2, 0.0), 0.5,
-                new FootPosition(0.0,  0.2, 0.0), 0.5,
-                new FootPosition(0.05, 0.2, 0.0), 0.5,
-                new FootPosition(0.05, 0.2, 0.0), 0.5
-        ));
-
-        Scheduler.getInstance().add(new CmdMoveRobot(this,
+        Command step1 = new CmdMoveRobot(this,
                 new FootPosition(0.0,  0.47, 0.0), 0.5,
                 new FootPosition(0.0,  0.47, 0.0), 0.5,
                 new FootPosition(0.05, 0.5,  0.0), 0.5,
                 new FootPosition(0.05, 0.5,  0.0), 0.5
-        ));
+        );
+
+        Command step2 = new CmdMoveRobot(this,
+                new FootPosition(0.0,  0.2, 0.0), 0.5,
+                new FootPosition(0.0,  0.2, 0.0), 0.5,
+                new FootPosition(0.05, 0.2, 0.0), 0.5,
+                new FootPosition(0.05, 0.2, 0.0), 0.5
+        );
+        CommandScheduler.getInstance().schedule(step1, step2);
         
     }
     
@@ -162,7 +163,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        Scheduler.getInstance().run();
+        CommandScheduler.getInstance().run();
 
         // frontLeftLeg.move(0.5);
         // frontRightLeg.move(0.5);
@@ -183,7 +184,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void autonomousInit() {
-        Scheduler.getInstance().add(setupActionChooser.getChosenActionCmd());
+        CommandScheduler.getInstance().schedule(setupActionChooser.getChosenActionCmd());
     }
     
     /**
@@ -192,7 +193,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void autonomousPeriodic() {
-        Scheduler.getInstance().run();
+        CommandScheduler.getInstance().run();
     }
 
     /**
@@ -200,7 +201,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
-        Scheduler.getInstance().removeAll();
+        CommandScheduler.getInstance().cancelAll();
 
         frontLeftLeg.neutral();
         frontRightLeg.neutral();

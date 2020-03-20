@@ -4,9 +4,9 @@ import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.RobotMath;
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class CmdServoLegTo extends Command {
+public class CmdServoLegTo extends CommandBase {
     private final double MAX_ERROR = 0.1;
 
     private Leg leg;
@@ -29,21 +29,20 @@ public class CmdServoLegTo extends Command {
     }
 
     @Override
-    protected void initialize() {
+    public void initialize() {
         final double[] thetas = leg.inverseKinematics(targetFootPosition.x, targetFootPosition.y, targetFootPosition.z);
         targetLegPosition = RobotMath.calculateLegPosition(thetas[0], thetas[1], thetas[2]);
     }
 
     @Override
-    protected void execute() {
+    public void execute() {
         legPosition = leg.getPosition();
 
         error = targetLegPosition.shoulder - legPosition.shoulder;
         if (Math.abs(error) > MAX_ERROR) {
             legPosition.shoulder += RobotMath.clip(error, -maxSpeed, maxSpeed);
             shoulderAtTarget = false;
-        }
-        else {
+        } else {
             legPosition.shoulder = targetLegPosition.shoulder;
             shoulderAtTarget = true;
         }
@@ -52,8 +51,7 @@ public class CmdServoLegTo extends Command {
         if (Math.abs(error) > MAX_ERROR) {
             legPosition.hinge += RobotMath.clip(error, -maxSpeed, maxSpeed);
             hingeAtTarget = false;
-        }
-        else {
+        } else {
             legPosition.hinge = targetLegPosition.hinge;
             hingeAtTarget = true;
         }
@@ -62,8 +60,7 @@ public class CmdServoLegTo extends Command {
         if (Math.abs(error) > MAX_ERROR) {
             legPosition.knee += RobotMath.clip(error, -maxSpeed, maxSpeed);
             kneeAtTarget = false;
-        }
-        else {
+        } else {
             legPosition.knee = targetLegPosition.knee;
             kneeAtTarget = true;
         }
@@ -72,12 +69,14 @@ public class CmdServoLegTo extends Command {
     }
 
     @Override
-    protected boolean isFinished() {
+    public boolean isFinished() {
         return shoulderAtTarget && hingeAtTarget && kneeAtTarget;
     }
 
     @Override
-    protected void end() {
-        
+    public void end(boolean interrupted) {
+        if (!interrupted) {
+            leg.set(targetLegPosition);
+        }
     }
 }
