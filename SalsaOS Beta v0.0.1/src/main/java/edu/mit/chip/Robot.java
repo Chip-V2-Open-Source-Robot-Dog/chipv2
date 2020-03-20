@@ -11,6 +11,9 @@ import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.moveactions.CmdMoveRobot;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
+import edu.mit.chip.trajectory.SpeedSet;
+import edu.mit.chip.trajectory.Trajectory;
+import edu.mit.chip.trajectory.Waypoint;
 import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
@@ -43,7 +46,7 @@ public class Robot extends TimedRobot {
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
     
-    private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
+    private Trajectory trajectory;
 
     Joystick joy = new Joystick(0);
     
@@ -98,6 +101,8 @@ public class Robot extends TimedRobot {
             new ZeroLegAction(backRightLeg, "Back Right")
         );
         setupActionChooser.putOnDashboard();
+
+        trajectory = new Trajectory(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
     }
     
     /**
@@ -141,21 +146,19 @@ public class Robot extends TimedRobot {
         // backRightLeg.addPoint(0.05, 0.5, 0.0);
 
         // maybe works stand up
-        Command step1 = new CmdMoveRobot(this,
-                new FootPosition(0.0,  0.47, 0.0), 0.5,
-                new FootPosition(0.0,  0.47, 0.0), 0.5,
-                new FootPosition(0.05, 0.5,  0.0), 0.5,
-                new FootPosition(0.05, 0.5,  0.0), 0.5
-        );
+        trajectory.addWaypoint(new Waypoint(
+            new FootPosition(0.0,  0.47, 0.0),
+            new FootPosition(0.0,  0.47, 0.0),
+            new FootPosition(0.05, 0.5,  0.0),
+            new FootPosition(0.05, 0.5,  0.0)
+        ));
 
-        Command step2 = new CmdMoveRobot(this,
-                new FootPosition(0.0,  0.2, 0.0), 0.5,
-                new FootPosition(0.0,  0.2, 0.0), 0.5,
-                new FootPosition(0.05, 0.2, 0.0), 0.5,
-                new FootPosition(0.05, 0.2, 0.0), 0.5
-        );
-        CommandScheduler.getInstance().schedule(step1, step2);
-        
+        trajectory.addWaypoint(new Waypoint(
+            new FootPosition(0.0,  0.2, 0.0),
+            new FootPosition(0.0,  0.2, 0.0),
+            new FootPosition(0.05, 0.2, 0.0),
+            new FootPosition(0.05, 0.2, 0.0)
+        ));        
     }
     
     /**
@@ -163,7 +166,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        CommandScheduler.getInstance().run();
+        trajectory.tick()
 
         // frontLeftLeg.move(0.5);
         // frontRightLeg.move(0.5);

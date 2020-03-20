@@ -1,12 +1,11 @@
-package edu.mit.chip.moveactions;
+package edu.mit.chip.trajectory;
 
 import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.RobotMath;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class CmdServoLegTo extends CommandBase {
+public class ServoLegCommand {
     private final double MAX_ERROR = 0.1;
 
     private Leg leg;
@@ -22,20 +21,53 @@ public class CmdServoLegTo extends CommandBase {
     private boolean hingeAtTarget = false;
     private boolean kneeAtTarget = false;
 
-    public CmdServoLegTo(Leg leg, FootPosition targetPosition, double maxSpeed) {
+    private TickState state;
+
+    public ServoLegCommand(Leg leg, FootPosition targetPosition, double maxSpeed) {
         this.leg = leg;
         this.targetFootPosition = targetPosition;
         this.maxSpeed = maxSpeed;
+
+        state = TickState.INITIALIZING;
     }
 
-    @Override
-    public void initialize() {
+    private enum TickState {
+        INITIALIZING,
+        EXECUTING,
+        ENDING,
+        DONE;
+    }
+
+    public void tick() {
+        switch (state) {
+            case INITIALIZING:
+                initialize();
+                state = TickState.EXECUTING;
+                break;
+            case EXECUTING:
+                execute();
+                if (isFinished())
+                    state = TickState.ENDING;
+                break;
+            case ENDING:
+                end();
+                state = TickState.DONE;
+                break;
+            case DONE:
+                break;
+        }
+    }
+
+    public boolean isDone() {
+        return state == TickState.DONE;
+    }
+
+    private void initialize() {
         final double[] thetas = leg.inverseKinematics(targetFootPosition.x, targetFootPosition.y, targetFootPosition.z);
         targetLegPosition = RobotMath.calculateLegPosition(thetas[0], thetas[1], thetas[2]);
     }
 
-    @Override
-    public void execute() {
+    private void execute() {
         legPosition = leg.getPosition();
 
         error = targetLegPosition.shoulder - legPosition.shoulder;
@@ -68,15 +100,11 @@ public class CmdServoLegTo extends CommandBase {
         leg.set(legPosition);
     }
 
-    @Override
-    public boolean isFinished() {
+    private boolean isFinished() {
         return shoulderAtTarget && hingeAtTarget && kneeAtTarget;
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        if (!interrupted) {
-            leg.set(targetLegPosition);
-        }
+    private void end() {
+        leg.set(targetLegPosition);
     }
 }
