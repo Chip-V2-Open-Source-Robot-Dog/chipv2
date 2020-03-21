@@ -127,12 +127,6 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
-        tGen.genStandSit(0.15, 0.45, 0.02);
-
-        boolean done = false;
-        while (!done) {
-            done = tGen.move(0.25);
-        }
     }
     
     /**
@@ -140,8 +134,12 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        boolean pressed = joy.getRawButton(1);
+        //GET THE A BUTTON
+        boolean pressed = joy.getRawButton(2);
+        //GET THE B BUTTON
+        boolean pressed2 = joy.getRawButton(1);
 
+        //SETUP ACTION ONE. IF THE B BUTTON IS PRESSED, SIT
         if(pressed) {
             if (clock == 1) {
                 tGen.clearTrajectory();
@@ -158,6 +156,22 @@ public class Robot extends TimedRobot {
             }
         }
 
+        //SETUP ACTION TWO. IF THE A BUTTON IS PRESSED, STAND.
+        if(pressed2) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.genStandSit(0.15, 0.45, 0.02);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
     }
     
     /**
