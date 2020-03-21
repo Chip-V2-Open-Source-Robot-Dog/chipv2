@@ -50,6 +50,8 @@ public class Robot extends TimedRobot {
     Joystick joy = new Joystick(0);
 
     private TrajectoryGenerator tGen;
+
+    int clock = 1;
     
     /**
     * This function is run when the robot code is first started up (or restarted).
@@ -138,6 +140,24 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
+        boolean pressed = joy.getRawButton(1);
+
+        if(pressed) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.genStandSit(0.45, 0.15, 0.02);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
+
     }
     
     /**
@@ -163,14 +183,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
-        tGen.clearTrajectory();
-        tGen.genStandSit(0.45, 0.15, 0.0);
-
-        boolean done = false;
-        while (!done) {
-            done = tGen.move(0.25);
-        }
-
         frontLeftLeg.neutral();
         frontRightLeg.neutral();
         backLeftLeg.neutral();
