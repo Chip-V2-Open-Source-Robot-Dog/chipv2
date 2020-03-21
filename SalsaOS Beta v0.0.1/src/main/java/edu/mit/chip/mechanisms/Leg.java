@@ -5,8 +5,10 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.mit.chip.utils.FootPosition;
+import edu.mit.chip.utils.LegModel;
 import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.LegReversal;
+import edu.mit.chip.utils.LegThetas;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.RobotMath;
 import edu.wpi.first.wpilibj.command.Command;
@@ -15,13 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 
 public class Leg {
-    double L1;
-    double L2;
-    double L3;
-    double L4;
-    double L5;
-    double L6;
-
+    public LegModel model;
     public LegReversal reversal;
 
     private LegPosition position;
@@ -48,26 +44,15 @@ public class Leg {
 
     public CANSparkMax shoulder, hinge, knee;
 
-    public Leg(int shoulderID, int hingeID, int kneeID, double[] model, boolean revShoulder, boolean revHinge, boolean revKnee) {
+    public Leg(int shoulderID, int hingeID, int kneeID, LegModel model, boolean revShoulder, boolean revHinge, boolean revKnee) {
         shoulder =  new CANSparkMax(shoulderID, MotorType.kBrushless);
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
 
-        trajectory = new ArrayList();
-
-        if(model.length==6) {
-            L1 = model[0];
-            L2 = model[1];
-            L3 = model[2];
-            L4 = model[3];
-            L5 = model[4];
-            L6 = model[5];
-        }
-        else {
-            throw new IllegalArgumentException("WARNING: Leg model does not match internal model. Too many or too few arguments!");
-        }
+        this.model = model;
 
         reversal = new LegReversal(revShoulder, revHinge, revKnee);
+        trajectory = new ArrayList();
     }
 
     public void loadPID(PIDConstants shoulderPID, PIDConstants hingePID, PIDConstants kneePID) {
@@ -92,6 +77,11 @@ public class Leg {
 
     public LegPosition getPosition() {
         return new LegPosition(getPosition(JointType.SHOULDER), getPosition(JointType.HINGE), getPosition(JointType.KNEE));
+    }
+
+    public LegThetas getThetas() {
+        LegPosition currentPosition = getPosition();
+        return new LegThetas(RobotMath.calculateTheta(currentPosition.shoulder), RobotMath.calculateTheta(currentPosition.hinge), RobotMath.calculateTheta(currentPosition.knee));
     }
 
     public void setEncoders(LegPosition legPosition) {
@@ -127,41 +117,25 @@ public class Leg {
     /*
     INVERSE AND FORWARDS KINEMATICS CONTROLS CODE 
     */
-    public double[] inverseKinematics(double xD, double yD, double zD) {
-        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
-        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
-
-        double rSquared = xD*xD+yD*yD;
-        double phi = Math.atan2(yD, xD);
-        double theta3 = Math.acos((rSquared-l1*l1-l2*l2)/(-2.0*l1*l2));
-        double alpha = Math.acos((l2*l2-l1*l1-rSquared)/(-2.0*l1*Math.sqrt(rSquared)));
-        double theta1 = phi-alpha;
-        double theta2 = Math.asin(zD/yD);
-
-        return new double[]{theta1, theta2, theta3};
-    }
 
     //WILL ALSO NEED A CURRENT LEG XYZ POS METHOD (FORWARDS KINEMATICS)
     public FootPosition getFootPosition() {
-        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
-        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
-        LegPosition currentPosition = getPosition();
+        double l1 = model.L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = model.L6; //Math.sqrt(L4*L4+L6*L6);
+        
+        LegThetas thetas = getThetas();
 
-        double shoulderTheta = RobotMath.calculateTheta(currentPosition.shoulder);
-        double hingeTheta = RobotMath.calculateTheta(currentPosition.hinge);
-        double kneeTheta = RobotMath.calculateTheta(currentPosition.knee);
-
-        double xe = l1*Math.cos(shoulderTheta)-l2*Math.cos(kneeTheta-shoulderTheta);
-        double ye = l1*Math.sin(shoulderTheta)+l2*Math.sin(kneeTheta-shoulderTheta);
-        double ze = ye*Math.sin(hingeTheta);
+        double xe = l1*Math.cos(thetas.shoulder)-l2*Math.cos(thetas.knee-thetas.shoulder);
+        double ye = l1*Math.sin(thetas.shoulder)+l2*Math.sin(thetas.knee-thetas.shoulder);
+        double ze = ye*Math.sin(thetas.hinge);
 
         return new FootPosition(xe, ye, ze);
     }
 
     // NOW WE NEED TO GENERATE A TRAJECTORY OF THETAS AND FOLLOW THAT
     public boolean traverseTo(double xD, double yD, double zD, double speedMAX) {
-        double[] thetas = inverseKinematics(xD, yD, zD);
-        LegPosition targetPosition = RobotMath.calculateLegPosition(thetas[0], thetas[1], thetas[2]);
+        LegThetas thetas = RobotMath.inverseKinematics(model, xD, yD, zD);
+        LegPosition targetPosition = RobotMath.calculateLegPosition(thetas);
         boolean there = executeCMD(targetPosition, speedMAX);
         //need to tell the other methods we've arrived at the point
         return there;
@@ -244,8 +218,8 @@ public class Leg {
     CODE INVOVLING TRAJECTORY GENERATION, CLEARING, AND EXECUTION 
     */
     public boolean addPoint(double xD, double yD, double zD) {
-        double l1 = L3; //Math.sqrt(L1*L1+L3*L3);
-        double l2 = L6; //Math.sqrt(L4*L4+L6*L6);
+        double l1 = model.L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = model.L6; //Math.sqrt(L4*L4+L6*L6);
         double r = Math.sqrt(xD*xD+yD*yD);
 
         //checks if the point has a solution in IK

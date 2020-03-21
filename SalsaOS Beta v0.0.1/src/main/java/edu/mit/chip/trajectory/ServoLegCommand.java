@@ -3,6 +3,7 @@ package edu.mit.chip.trajectory;
 import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.utils.FootPosition;
 import edu.mit.chip.utils.LegPosition;
+import edu.mit.chip.utils.LegThetas;
 import edu.mit.chip.utils.RobotMath;
 
 public class ServoLegCommand {
@@ -63,38 +64,35 @@ public class ServoLegCommand {
     }
 
     private void initialize() {
-        final double[] thetas = leg.inverseKinematics(targetFootPosition.x, targetFootPosition.y, targetFootPosition.z);
-        targetLegPosition = RobotMath.calculateLegPosition(thetas[0], thetas[1], thetas[2]);
+        final LegThetas thetas = RobotMath.inverseKinematics(leg.model, targetFootPosition.x, targetFootPosition.y, targetFootPosition.z);
+        targetLegPosition = RobotMath.calculateLegPosition(thetas);
     }
 
     private void execute() {
         legPosition = leg.getPosition();
 
         error = targetLegPosition.shoulder - legPosition.shoulder;
-        if (Math.abs(error) > MAX_ERROR) {
+        shoulderAtTarget = Math.abs(error) <= MAX_ERROR;
+        if (!shoulderAtTarget) {
             legPosition.shoulder += RobotMath.clip(error, -maxSpeed, maxSpeed);
-            shoulderAtTarget = false;
         } else {
             legPosition.shoulder = targetLegPosition.shoulder;
-            shoulderAtTarget = true;
         }
 
         error = targetLegPosition.hinge - legPosition.hinge;
-        if (Math.abs(error) > MAX_ERROR) {
+        hingeAtTarget = Math.abs(error) <= MAX_ERROR;
+        if (!hingeAtTarget) {
             legPosition.hinge += RobotMath.clip(error, -maxSpeed, maxSpeed);
-            hingeAtTarget = false;
         } else {
             legPosition.hinge = targetLegPosition.hinge;
-            hingeAtTarget = true;
         }
 
         error = targetLegPosition.knee - legPosition.knee;
-        if (Math.abs(error) > MAX_ERROR) {
+        kneeAtTarget = Math.abs(error) <= MAX_ERROR;
+        if (!kneeAtTarget) {
             legPosition.knee += RobotMath.clip(error, -maxSpeed, maxSpeed);
-            kneeAtTarget = false;
         } else {
             legPosition.knee = targetLegPosition.knee;
-            kneeAtTarget = true;
         }
 
         leg.set(legPosition);

@@ -15,6 +15,7 @@ import edu.mit.chip.trajectory.SpeedSet;
 import edu.mit.chip.trajectory.TrajectoryRunner;
 import edu.mit.chip.trajectory.Waypoint;
 import edu.mit.chip.utils.FootPosition;
+import edu.mit.chip.utils.LegModel;
 import edu.mit.chip.utils.PIDConstants;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -56,13 +57,13 @@ public class Robot extends TimedRobot {
         System.out.println("Initializing robot...");
         System.out.println("Attempting to construct legs.");
 
-        double[] leftLeg = new double[]{0.055, 0.075, 0.235, 0.1, 0.03, 0.32};
-        double[] rightLeg = new double[]{0.055, -0.075, 0.235, 0.1, -0.03, 0.32};
+        LegModel leftLegs = new LegModel(0.055, 0.075, 0.235, 0.1, 0.03, 0.32);
+        LegModel rightLegs = new LegModel(0.055, -0.075, 0.235, 0.1, -0.03, 0.32);
                 
-        frontLeftLeg  = new Leg(3, 2, 1, leftLeg, true, false, false);
-        frontRightLeg = new Leg(12, 10, 11, rightLeg, false, true, true);
-        backLeftLeg   = new Leg(4, 6, 5, leftLeg, true, false, false);
-        backRightLeg  = new Leg(9, 7, 8, rightLeg, false, true, true);
+        frontLeftLeg  = new Leg(3, 2, 1, leftLegs, true, false, false);
+        frontRightLeg = new Leg(12, 10, 11, rightLegs, false, true, true);
+        backLeftLeg   = new Leg(4, 6, 5, leftLegs, true, false, false);
+        backRightLeg  = new Leg(9, 7, 8, rightLegs, false, true, true);
         
         System.out.println("Legs constructed.");
         
