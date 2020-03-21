@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.Joystick;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.mit.chip.robotmovement.TrajectoryGenerator;
+
 /**
 * The VM is configured to automatically run this class, and to call the
 * functions corresponding to each mode, as described in the TimedRobot
@@ -46,6 +48,8 @@ public class Robot extends TimedRobot {
     private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
 
     Joystick joy = new Joystick(0);
+
+    TrajectoryGenerator tGen = new TrajectoryGenerator(frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg);
     
     /**
     * This function is run when the robot code is first started up (or restarted).
@@ -118,14 +122,8 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         //PLACE SETUP CODE HERE
-        frontLeftLeg.clearTrajectory();
-        frontRightLeg.clearTrajectory();
-        backLeftLeg.clearTrajectory();
-        backRightLeg.clearTrajectory();
-
-        SmartDashboard.putNumber("X", 0.0);
-        SmartDashboard.putNumber("Y", 0.0);
-        SmartDashboard.putNumber("Z", 0.0);
+        tGen.clearTrajectory();
+        tGen.genStandup(0.15, 0.45, 0.05);
     }
     
     /**
@@ -133,33 +131,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        System.out.println(joy.getRawButton(1));
-        if (joy.getRawButton(1)) {
-            frontLeftLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
-        }
-        /* DISABLES UNTIL LEG IS HEALTHY AGAIN 
-        if (joy.getRawButton(2)) {
-            backLeftLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
-        }
-        */
-        if (joy.getRawButton(3)) {
-            frontRightLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
-        }
-        if (joy.getRawButton(4)) {
-            backRightLeg.addPoint(SmartDashboard.getNumber("X", 0.0), SmartDashboard.getNumber("Y", 0.0), SmartDashboard.getNumber("Z", 0.0));
-        }
-
         frontLeftLeg.move(0.5);
         frontRightLeg.move(0.5);
-        //backLeftLeg.move(0.5);
+        backLeftLeg.move(0.5);
         backRightLeg.move(0.5);
-
-        /*
-        frontLeftLeg.home(0.5);
-        frontRightLeg.home(0.5);
-        backLeftLeg.home(0.5);
-        backRightLeg.home(0.5);
-        */
     }
     
     /**
