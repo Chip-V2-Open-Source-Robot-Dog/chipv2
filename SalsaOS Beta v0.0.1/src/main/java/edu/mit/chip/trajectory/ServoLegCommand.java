@@ -21,17 +21,17 @@ public class ServoLegCommand {
     private boolean hingeAtTarget = false;
     private boolean kneeAtTarget = false;
 
-    private TickState state;
+    private State state;
 
     public ServoLegCommand(Leg leg, FootPosition targetPosition, double maxSpeed) {
         this.leg = leg;
         this.targetFootPosition = targetPosition;
         this.maxSpeed = maxSpeed;
 
-        state = TickState.INITIALIZING;
+        state = State.INITIALIZING;
     }
 
-    private enum TickState {
+    private enum State {
         INITIALIZING,
         EXECUTING,
         ENDING,
@@ -42,16 +42,16 @@ public class ServoLegCommand {
         switch (state) {
             case INITIALIZING:
                 initialize();
-                state = TickState.EXECUTING;
+                state = State.EXECUTING;
                 break;
             case EXECUTING:
                 execute();
                 if (isFinished())
-                    state = TickState.ENDING;
+                    state = State.ENDING;
                 break;
             case ENDING:
                 end();
-                state = TickState.DONE;
+                state = State.DONE;
                 break;
             case DONE:
                 break;
@@ -59,7 +59,7 @@ public class ServoLegCommand {
     }
 
     public boolean isDone() {
-        return state == TickState.DONE;
+        return state == State.DONE;
     }
 
     private void initialize() {

@@ -12,14 +12,12 @@ import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
 import edu.mit.chip.trajectory.SpeedSet;
-import edu.mit.chip.trajectory.Trajectory;
+import edu.mit.chip.trajectory.TrajectoryRunner;
 import edu.mit.chip.trajectory.Waypoint;
 import edu.mit.chip.utils.FootPosition;
-import edu.mit.chip.utils.LegPosition;
 import edu.mit.chip.utils.PIDConstants;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -46,7 +44,7 @@ public class Robot extends TimedRobot {
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
     
-    private Trajectory trajectory;
+    private TrajectoryRunner trajectoryRunner;
 
     Joystick joy = new Joystick(0);
     
@@ -102,7 +100,7 @@ public class Robot extends TimedRobot {
         );
         setupActionChooser.putOnDashboard();
 
-        trajectory = new Trajectory(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+        trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
     }
     
     /**
@@ -145,20 +143,21 @@ public class Robot extends TimedRobot {
         // backLeftLeg.addPoint(0.05, 0.5, 0.0);
         // backRightLeg.addPoint(0.05, 0.5, 0.0);
 
-        // maybe works stand up
-        trajectory.addWaypoint(new Waypoint(
-            new FootPosition(0.0,  0.47, 0.0),
-            new FootPosition(0.0,  0.47, 0.0),
-            new FootPosition(0.05, 0.5,  0.0),
-            new FootPosition(0.05, 0.5,  0.0)
-        ));
-
-        trajectory.addWaypoint(new Waypoint(
-            new FootPosition(0.0,  0.2, 0.0),
-            new FootPosition(0.0,  0.2, 0.0),
-            new FootPosition(0.05, 0.2, 0.0),
-            new FootPosition(0.05, 0.2, 0.0)
-        ));        
+        trajectoryRunner.reset();
+        trajectoryRunner.addWaypoints(
+            new Waypoint(
+                new FootPosition(0.0,  0.47, 0.0),
+                new FootPosition(0.0,  0.47, 0.0),
+                new FootPosition(0.05, 0.5,  0.0),
+                new FootPosition(0.05, 0.5,  0.0)
+            ),
+            new Waypoint(
+                new FootPosition(0.0,  0.2, 0.0),
+                new FootPosition(0.0,  0.2, 0.0),
+                new FootPosition(0.05, 0.2, 0.0),
+                new FootPosition(0.05, 0.2, 0.0)
+            )
+        );        
     }
     
     /**
@@ -166,7 +165,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        trajectory.tick();
+        trajectoryRunner.tick();
 
         // frontLeftLeg.move(0.5);
         // frontRightLeg.move(0.5);

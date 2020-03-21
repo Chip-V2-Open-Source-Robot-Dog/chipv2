@@ -1,58 +1,77 @@
 package edu.mit.chip.trajectory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import edu.mit.chip.Robot;
 
-public class Trajectory {
-    public enum TickState {
-        INITIALIZE,
-        EXECUTE;
+public class TrajectoryRunner {
+    public enum State {
+        LOADING,
+        SERVOING,
+        PAUSED;
     }
 
     private Robot robot;
     private SpeedSet speedSet;
     private ArrayList<Waypoint> waypoints;
 
-    private TickState state;
+    private State state;
 
     private ServoLegCommand frontLeftLegCommand, frontRightLegCommand, backLeftLegCommand, backRightLegCommand;
 
-    public Trajectory(Robot robot, SpeedSet speedSet, Waypoint... waypoints) {
+    public TrajectoryRunner(Robot robot, SpeedSet speedSet, Waypoint... waypoints) {
+        this.robot = robot;
+        this.speedSet = speedSet;
+
         this.waypoints = new ArrayList<Waypoint>();
-        
         for (Waypoint wp : waypoints) {
             this.waypoints.add(wp);
         }
-        
-        this.robot = robot;
-        this.speedSet = speedSet;
-        this.state = TickState.INITIALIZE;
+
+        state = State.LOADING;
+    }
+
+    public void reset() {
+        state = State.LOADING;
+        waypoints.clear();
     }
     
     public void addWaypoint(Waypoint waypoint) {
         waypoints.add(waypoint);
     }
 
+    public void addWaypoints(Waypoint... waypoints) {
+        for (Waypoint wp : waypoints) {
+            this.waypoints.add(wp);
+        }
+    }
+
+    public void pause() {
+        state = State.PAUSED;
+    }
+
+    public void resume() {
+        state = State.LOADING;
+    }
+
     public void tick() {
-        if (state == TickState.INITIALIZE && waypoints.size() > 0) {
+        if (state == State.LOADING && waypoints.size() > 0) {
             frontLeftLegCommand = new ServoLegCommand(robot.frontLeftLeg, waypoints.get(0).frontLeft, speedSet.frontLeft);
             frontRightLegCommand = new ServoLegCommand(robot.frontRightLeg, waypoints.get(0).frontRight, speedSet.frontRight);
             backLeftLegCommand = new ServoLegCommand(robot.backLeftLeg, waypoints.get(0).backLeft, speedSet.backLeft);
             backRightLegCommand = new ServoLegCommand(robot.backRightLeg, waypoints.get(0).backRight, speedSet.backRight);
 
-            state = TickState.EXECUTE;
+            state = State.SERVOING;
         }
-        else if (state == TickState.EXECUTE) {
+        else if (state == State.SERVOING) {
             frontLeftLegCommand.tick();
             frontRightLegCommand.tick();
             backLeftLegCommand.tick();
             backRightLegCommand.tick();
 
             if (frontLeftLegCommand.isDone() && frontRightLegCommand.isDone() && backLeftLegCommand.isDone() && backRightLegCommand.isDone()) {
-                state = TickState.INITIALIZE;
+                waypoints.remove(0);
+                state = State.LOADING;
             }
         }
         else {
