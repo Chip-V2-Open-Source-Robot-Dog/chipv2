@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
 
     Joystick joy = new Joystick(0);
 
-    TrajectoryGenerator tGen = new TrajectoryGenerator(frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg);
+    private TrajectoryGenerator tGen;
     
     /**
     * This function is run when the robot code is first started up (or restarted).
@@ -66,6 +66,8 @@ public class Robot extends TimedRobot {
         frontRightLeg = new Leg(12, 10, 11, rightLeg, false, true, true);
         backLeftLeg   = new Leg(4, 5, 6, leftLeg, true, false, false);
         backRightLeg  = new Leg(9, 7, 8, rightLeg, false, true, true);
+
+        tGen = new TrajectoryGenerator(frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg);
         
         System.out.println("Legs constructed.");
         
@@ -123,7 +125,7 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
-        tGen.genStandup(0.15, 0.45, 0.05);
+        tGen.genStandSit(0.15, 0.45, 0.05);
     }
     
     /**
@@ -131,10 +133,10 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.move(0.5);
-        frontRightLeg.move(0.5);
-        backLeftLeg.move(0.5);
-        backRightLeg.move(0.5);
+        frontLeftLeg.move(0.7);
+        frontRightLeg.move(0.7);
+        backLeftLeg.move(0.7);
+        backRightLeg.move(0.7);
     }
     
     /**
