@@ -260,7 +260,7 @@ public class Leg {
         trajectory = new ArrayList();
     }
 
-    public void move(double speedMAX){
+    public boolean move(double speedMAX){
         //if there's a trajectory we will be following that
         if (trajectory.size()>0) {
             //get the point we want to go to
@@ -271,11 +271,13 @@ public class Leg {
             if (there) {
                 trajectory.remove(0);
             }
+            return false;
         }
         //otherwise we will be staying still
         else{
             position = getPosition();
             set(position);
+            return true;
         }
     }
 

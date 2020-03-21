@@ -25,25 +25,25 @@ public class TrajectoryGenerator {
         backRightLeg.clearTrajectory();
     }
 
-    public void genStandSit(double startingY, double finalY, double resolution) {
-        if (startingY<finalY) {
-            for (double increment = startingY; increment <= finalY; increment = increment+resolution) {
-                frontLeftLeg.addPoint(0.0, increment, 0.0);
-                frontRightLeg.addPoint(0.0, increment, 0.0);
-                backLeftLeg.addPoint(0.0, increment, 0.0);
-                backRightLeg.addPoint(0.0, increment, 0.0);
-            }
-        }
-        else if (startingY>finalY) {
-            for (double increment = startingY; increment >= finalY; increment = increment-resolution) {
-                frontLeftLeg.addPoint(0.0, increment, 0.0);
-                frontRightLeg.addPoint(0.0, increment, 0.0);
-                backLeftLeg.addPoint(0.0, increment, 0.0);
-                backRightLeg.addPoint(0.0, increment, 0.0);
-            }
-        }
+    public void genStandSit(double startingY, double finalY, double offset) {
+        frontLeftLeg.addPoint(0.0, startingY, 0.0);
+        frontRightLeg.addPoint(0.0, startingY, 0.0);
+        backLeftLeg.addPoint(0.0, startingY+offset, 0.0);
+        backRightLeg.addPoint(0.0, startingY+offset, 0.0);
+
+        frontLeftLeg.addPoint(0.0, finalY, 0.0);
+        frontRightLeg.addPoint(0.0, finalY, 0.0);
+        backLeftLeg.addPoint(0.0, finalY+offset, 0.0);
+        backRightLeg.addPoint(0.0, finalY+offset, 0.0);
     }
 
+    public boolean move(double speed) {
+        boolean t1 = frontLeftLeg.move(speed);
+        boolean t2 = frontRightLeg.move(speed);
+        boolean t3 = backLeftLeg.move(speed);
+        boolean t4 = backRightLeg.move(speed);
+        return t1 && t2 && t3 && t4;
+    }
 }
 
 

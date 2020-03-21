@@ -125,7 +125,12 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
-        tGen.genStandSit(0.15, 0.45, 0.1);
+        tGen.genStandSit(0.15, 0.45, 0.02);
+
+        boolean done = false;
+        while (!done) {
+            done = tGen.move(0.25);
+        }
     }
     
     /**
@@ -133,10 +138,6 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        frontLeftLeg.move(0.7);
-        frontRightLeg.move(0.7);
-        backLeftLeg.move(0.7);
-        backRightLeg.move(0.7);
     }
     
     /**
@@ -162,6 +163,14 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        tGen.clearTrajectory();
+        tGen.genStandSit(0.45, 0.15, 0.0);
+
+        boolean done = false;
+        while (!done) {
+            done = tGen.move(0.25);
+        }
+
         frontLeftLeg.neutral();
         frontRightLeg.neutral();
         backLeftLeg.neutral();
