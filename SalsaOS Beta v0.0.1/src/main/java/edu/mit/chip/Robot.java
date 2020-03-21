@@ -63,7 +63,7 @@ public class Robot extends TimedRobot {
                 
         frontLeftLeg  = new Leg(3, 2, 1, leftLeg, true, false, false);
         frontRightLeg = new Leg(12, 10, 11, rightLeg, false, true, true);
-        backLeftLeg   = new Leg(4, 5, 6, leftLeg, true, false, false);
+        backLeftLeg   = new Leg(4, 6, 5, leftLeg, true, false, false);
         backRightLeg  = new Leg(9, 7, 8, rightLeg, false, true, true);
         
         System.out.println("Legs constructed.");

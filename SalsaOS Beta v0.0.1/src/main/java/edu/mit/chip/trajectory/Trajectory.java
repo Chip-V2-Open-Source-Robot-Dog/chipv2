@@ -26,7 +26,9 @@ public class Trajectory {
         for (Waypoint wp : waypoints) {
             this.waypoints.add(wp);
         }
-
+        
+        this.robot = robot;
+        this.speedSet = speedSet;
         this.state = TickState.INITIALIZE;
     }
     
