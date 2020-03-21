@@ -8,7 +8,7 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.moveactions.CmdMoveRobot;
+//import edu.mit.chip.moveactions.CmdMoveRobot;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
 import edu.mit.chip.trajectory.SpeedSet;
@@ -166,7 +166,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        trajectory.tick()
+        trajectory.tick();
 
         // frontLeftLeg.move(0.5);
         // frontRightLeg.move(0.5);
