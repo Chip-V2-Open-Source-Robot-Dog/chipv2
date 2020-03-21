@@ -1,5 +1,6 @@
 package edu.mit.chip.trajectory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,14 +14,18 @@ public class Trajectory {
 
     private Robot robot;
     private SpeedSet speedSet;
-    private List<Waypoint> waypoints;
+    private ArrayList<Waypoint> waypoints;
 
     private TickState state;
 
     private ServoLegCommand frontLeftLegCommand, frontRightLegCommand, backLeftLegCommand, backRightLegCommand;
 
     public Trajectory(Robot robot, SpeedSet speedSet, Waypoint... waypoints) {
-        this.waypoints = Arrays.asList(waypoints);
+        this.waypoints = new ArrayList<Waypoint>();
+        
+        for (Waypoint wp : waypoints) {
+            this.waypoints.add(wp);
+        }
 
         this.state = TickState.INITIALIZE;
     }
