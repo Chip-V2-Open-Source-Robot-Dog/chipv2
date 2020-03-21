@@ -11,7 +11,6 @@ import edu.mit.chip.utils.LegReversal;
 import edu.mit.chip.utils.LegThetas;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.RobotMath;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.ArrayList;
@@ -44,14 +43,14 @@ public class Leg {
 
     public CANSparkMax shoulder, hinge, knee;
 
-    public Leg(int shoulderID, int hingeID, int kneeID, LegModel model, boolean revShoulder, boolean revHinge, boolean revKnee) {
+    public Leg(LegModel model, int shoulderID, boolean shoulderReverse, int hingeID, boolean hingeReverse, int kneeID, boolean kneeReverse) {
         shoulder =  new CANSparkMax(shoulderID, MotorType.kBrushless);
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
 
         this.model = model;
 
-        reversal = new LegReversal(revShoulder, revHinge, revKnee);
+        reversal = new LegReversal(shoulderReverse, hingeReverse, kneeReverse);
         trajectory = new ArrayList();
     }
 
