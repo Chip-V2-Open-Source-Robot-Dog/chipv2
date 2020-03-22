@@ -61,6 +61,23 @@ public class TrajectoryGenerator {
         backLeftLeg.addPoint(BL.x, BL.y+YL_ADDER, BL.z+(BL.y+YL_ADDER)*ZL_MULTIPLIER);
     }
 
+    public void transferWeight(double direction) {
+        //-1 is back 1 is forwards and 0 is nothing.
+        if (direction == 1.0 || direction == 0.0 || direction == -1.0) {
+            FL = frontLeftLeg.getFootPosition();
+            FR = frontRightLeg.getFootPosition();
+            BR = backRightLeg.getFootPosition();
+            BL = backLeftLeg.getFootPosition();
+
+            double mag = 1.0/50.0;
+
+            frontLeftLeg.addPoint(FL.x+direction*mag, FL.y, FL.z);
+            frontRightLeg.addPoint(FR.x+direction*mag, FR.y, FR.z);
+            backRightLeg.addPoint(BR.x+direction*mag, BR.y, BR.z);
+            backLeftLeg.addPoint(BL.x+direction*mag, BL.y, BL.z);
+        }
+    }
+
     public boolean move(double speed) {
         boolean t1 = frontLeftLeg.move(speed);
         boolean t2 = frontRightLeg.move(speed);

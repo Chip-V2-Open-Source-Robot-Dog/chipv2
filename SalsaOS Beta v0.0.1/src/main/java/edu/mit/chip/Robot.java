@@ -208,6 +208,45 @@ public class Robot extends TimedRobot {
 
 
 
+
+        //SETUP ACTION ONE. IF THE FRONT PAD BUTTON  IS PRESSED, TRANSFER WEIGHT FORWARD
+        if(pressed3==0) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.transferWeight(1.0);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
+
+
+
+        //SETUP ACTION ONE. IF THE BACK PAD BUTTON  IS PRESSED, TRANSFER WEIGHT BACKWARD
+        if(pressed3==180) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.transferWeight(-1.0);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
+
+
+
         
         //SETUP ACTION TWO. IF THE A BUTTON IS PRESSED, STAND.
         if(pressed2) {
@@ -250,6 +289,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
+        tGen.clearTrajectory();
+
         frontLeftLeg.neutral();
         frontRightLeg.neutral();
         backLeftLeg.neutral();
