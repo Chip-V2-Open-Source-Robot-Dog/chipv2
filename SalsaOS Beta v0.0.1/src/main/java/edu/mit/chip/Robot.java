@@ -8,7 +8,6 @@
 package edu.mit.chip;
 
 import edu.mit.chip.mechanisms.Leg;
-//import edu.mit.chip.moveactions.CmdMoveRobot;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
 import edu.mit.chip.trajectory.SpeedSet;
@@ -121,29 +120,6 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        // frontLeftLeg.clearTrajectory();
-        // frontRightLeg.clearTrajectory();
-        // backLeftLeg.clearTrajectory();
-        // backRightLeg.clearTrajectory();
-
-        /*
-        frontRightLeg.addPoint(0.0, 0.40, 0.0);
-        backLeftLeg.addPoint(0.0, 0.45, 0.0);
-        backRightLeg.addPoint(0.0, 0.35, 0.0);
-        */
-
-        //PRETTY GOOD "STAND UP"
-        
-        // frontLeftLeg.addPoint(0.0, 0.2, 0.0);
-        // frontRightLeg.addPoint(0.0, 0.2, 0.0);
-        // backLeftLeg.addPoint(0.05, 0.2, 0.0);
-        // backRightLeg.addPoint(0.05, 0.2, 0.0);
-        
-        // frontLeftLeg.addPoint(0.0, 0.47, 0.0);
-        // frontRightLeg.addPoint(0.0, 0.47, 0.0);
-        // backLeftLeg.addPoint(0.05, 0.5, 0.0);
-        // backRightLeg.addPoint(0.05, 0.5, 0.0);
-
         trajectoryRunner.reset();
         trajectoryRunner.addWaypoints(
             new Waypoint(
@@ -167,18 +143,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         trajectoryRunner.tick();
-
-        // frontLeftLeg.move(0.5);
-        // frontRightLeg.move(0.5);
-        // backLeftLeg.move(0.5);
-        // backRightLeg.move(0.5);
-
-        /*
-        frontLeftLeg.home(0.5);
-        frontRightLeg.home(0.5);
-        backLeftLeg.home(0.5);
-        backRightLeg.home(0.5);
-        */
     }
     
     /**
