@@ -52,8 +52,8 @@ public class TrajectoryGenerator {
         BR = backRightLeg.getFootPosition();
         BL = backLeftLeg.getFootPosition();
 
-        double ZL_MULTIPLIER = -1.0*sin(rollAngle);
-        double ZR_MULTIPLIER = sin(rollAngle);
+        double ZL_MULTIPLIER = -1.0*Math.sin(rollAngle);
+        double ZR_MULTIPLIER = Math.sin(rollAngle);
 
         frontLeftLeg.addPoint(FL.x, FL.y+YL_ADDER, FL.z+(FL.y+YL_ADDER)*ZL_MULTIPLIER);
         frontRightLeg.addPoint(FR.x, FR.y+YR_ADDER, FR.z+(FR.y+YR_ADDER)*ZR_MULTIPLIER);

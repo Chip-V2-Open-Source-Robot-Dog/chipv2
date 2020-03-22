@@ -129,29 +129,6 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
-        tGen.genStandSit(0.45, 0.15, 0.02);
-
-        while (!done) {
-            done = tGen.move(0.25);
-        }
-
-        tGen.lean(0.5, robotWidth);
-
-        while (!done) {
-            done = tGen.move(0.25);
-        }
-
-        tGen.lean(-0.5, robotWidth);
-
-        while (!done) {
-            done = tGen.move(0.25);
-        }
-
-        tGen.lean(0.0, robotWidth);
-
-        while (!done) {
-            done = tGen.move(0.25);
-        }
     }
     
     /**
@@ -163,6 +140,12 @@ public class Robot extends TimedRobot {
         boolean pressed = joy.getRawButton(2);
         //GET THE B BUTTON
         boolean pressed2 = joy.getRawButton(1);
+        //GET THE LEFT PAD BUTTON
+        int pressed3 = joy.getPOV();
+
+
+
+
 
         //SETUP ACTION ONE. IF THE B BUTTON IS PRESSED, SIT
         if(pressed) {
@@ -181,6 +164,51 @@ public class Robot extends TimedRobot {
             }
         }
 
+
+
+
+        //SETUP ACTION ONE. IF THE LEFT PAD BUTTON  IS PRESSED, ROLL ANGLE IS NEGATIVE
+        if(pressed3==270) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.lean(-0.05, robotWidth);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
+
+
+
+
+
+        //SETUP ACTION ONE. IF THE RIGHT PAD BUTTON  IS PRESSED, ROLL ANGLE IS POSITIVE
+        if(pressed3==90) {
+            if (clock == 1) {
+                tGen.clearTrajectory();
+                tGen.lean(0.05, robotWidth);
+                clock += 1;
+            }
+
+            boolean done = false;
+            while (!done) {
+                done = tGen.move(0.25);
+            }
+            if (done) {
+                clock = 1;
+            }
+        }
+
+
+
+
+        
         //SETUP ACTION TWO. IF THE A BUTTON IS PRESSED, STAND.
         if(pressed2) {
             if (clock == 1) {
