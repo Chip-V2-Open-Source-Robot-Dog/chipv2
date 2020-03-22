@@ -207,7 +207,7 @@ public class Robot extends TimedRobot {
 
 
 
-
+/*
 
         //SETUP ACTION ONE. IF THE FRONT PAD BUTTON  IS PRESSED, TRANSFER WEIGHT FORWARD
         if(pressed3==0) {
@@ -244,7 +244,7 @@ public class Robot extends TimedRobot {
                 clock = 1;
             }
         }
-
+*/
 
 
         
