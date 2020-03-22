@@ -44,6 +44,8 @@ public class Robot extends TimedRobot {
     private final double kMaxOutput =  1.0;
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
+
+    private final double robotWidth = 0.44;
     
     private LegPosition frontLeftPosition, frontRightPosition, backLeftPosition, backRightPosition;
 
@@ -127,6 +129,29 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
+        tGen.genStandSit(0.45, 0.15, 0.02);
+
+        while (!done) {
+            done = tGen.move(0.25);
+        }
+
+        tGen.lean(0.5, robotWidth);
+
+        while (!done) {
+            done = tGen.move(0.25);
+        }
+
+        tGen.lean(-0.5, robotWidth);
+
+        while (!done) {
+            done = tGen.move(0.25);
+        }
+
+        tGen.lean(0.0, robotWidth);
+
+        while (!done) {
+            done = tGen.move(0.25);
+        }
     }
     
     /**

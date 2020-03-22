@@ -1,11 +1,13 @@
 package edu.mit.chip.robotmovement;
 
 import edu.mit.chip.mechanisms.Leg;
+import edu.mit.chip.utils.FootPosition;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TrajectoryGenerator {
     Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
+    FootPosition FL, FR, BL, BR;
 
     public TrajectoryGenerator(Leg FLL, Leg FRL, Leg BLL, Leg BRL) {
         if (FLL == null || FRL == null || BLL == null || BRL ==null) {
@@ -35,6 +37,28 @@ public class TrajectoryGenerator {
         frontRightLeg.addPoint(0.0, finalY, 0.0);
         backLeftLeg.addPoint(0.0, finalY+offset, 0.0);
         backRightLeg.addPoint(0.0, finalY+offset, 0.0);
+    }
+
+    public void lean(double rollAngle, double robotWidth) {
+        if (Math.abs(rollAngle) >= Math.PI/12) {
+            rollAngle = Math.signum(rollAngle)*Math.PI/12;
+        }
+
+        double YL_ADDER = 0.5*robotWidth*Math.sin(rollAngle);
+        double YR_ADDER = -1.0*YL_ADDER;
+
+        FL = frontLeftLeg.getFootPosition();
+        FR = frontRightLeg.getFootPosition();
+        BR = backRightLeg.getFootPosition();
+        BL = backLeftLeg.getFootPosition();
+
+        double ZL_MULTIPLIER = -1.0*sin(rollAngle);
+        double ZR_MULTIPLIER = sin(rollAngle);
+
+        frontLeftLeg.addPoint(FL.x, FL.y+YL_ADDER, FL.z+(FL.y+YL_ADDER)*ZL_MULTIPLIER);
+        frontRightLeg.addPoint(FR.x, FR.y+YR_ADDER, FR.z+(FR.y+YR_ADDER)*ZR_MULTIPLIER);
+        backRightLeg.addPoint(BR.x, BR.y+YR_ADDER, BR.z+(BR.y+YR_ADDER)*ZR_MULTIPLIER);
+        backLeftLeg.addPoint(BL.x, BL.y+YL_ADDER, BL.z+(BL.y+YL_ADDER)*ZL_MULTIPLIER);
     }
 
     public boolean move(double speed) {
