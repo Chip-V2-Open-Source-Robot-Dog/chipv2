@@ -39,46 +39,6 @@ public class TrajectoryGenerator {
         backRightLeg.addPoint(0.0, finalY+offset, 0.0);
     }
 
-    public void lean(double rollAngle, double robotWidth) {
-        if (Math.abs(rollAngle) >= Math.PI/12) {
-            rollAngle = Math.signum(rollAngle)*Math.PI/12;
-        }
-
-        double YL_ADDER = 0.5*robotWidth*Math.sin(rollAngle);
-        double YR_ADDER = -1.0*YL_ADDER;
-
-        FL = frontLeftLeg.getFootPosition();
-        FR = frontRightLeg.getFootPosition();
-        BR = backRightLeg.getFootPosition();
-        BL = backLeftLeg.getFootPosition();
-
-        double ZL_MULTIPLIER = -1.0*Math.sin(rollAngle);
-        double ZR_MULTIPLIER = Math.sin(rollAngle);
-
-        frontLeftLeg.addPoint(FL.x, FL.y+YL_ADDER, FL.z+(FL.y+YL_ADDER)*ZL_MULTIPLIER);
-        frontRightLeg.addPoint(FR.x, FR.y+YR_ADDER, FR.z+(FR.y+YR_ADDER)*ZR_MULTIPLIER);
-        backRightLeg.addPoint(BR.x, BR.y+YR_ADDER, BR.z+(BR.y+YR_ADDER)*ZR_MULTIPLIER);
-        backLeftLeg.addPoint(BL.x, BL.y+YL_ADDER, BL.z+(BL.y+YL_ADDER)*ZL_MULTIPLIER);
-    }
-/*
-    public void transferWeight(double direction) {
-        //-1 is back 1 is forwards and 0 is nothing.
-        if (direction == 1.0 || direction == 0.0 || direction == -1.0) {
-            FL = frontLeftLeg.getFootPosition();
-            FR = frontRightLeg.getFootPosition();
-            BR = backRightLeg.getFootPosition();
-            BL = backLeftLeg.getFootPosition();
-
-            double mag = 1.0/50.0;
-
-            frontLeftLeg.addPoint(FL.x+direction*mag, FL.y, FL.z);
-            frontRightLeg.addPoint(FR.x+direction*mag, FR.y, FR.z);
-            backRightLeg.addPoint(BR.x+direction*mag, BR.y, BR.z);
-            backLeftLeg.addPoint(BL.x+direction*mag, BL.y, BL.z);
-        }
-    }
-    */
-
     public boolean move(double speed) {
         boolean t1 = frontLeftLeg.move(speed);
         boolean t2 = frontRightLeg.move(speed);
