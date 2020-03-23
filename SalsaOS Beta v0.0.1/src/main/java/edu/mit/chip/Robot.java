@@ -129,6 +129,7 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         //PLACE SETUP CODE HERE
         tGen.clearTrajectory();
+
     }
     
     /**
@@ -151,7 +152,7 @@ public class Robot extends TimedRobot {
         if(pressed) {
             if (clock == 1) {
                 tGen.clearTrajectory();
-                tGen.genStandSit(0.45, 0.15, 0.02);
+                tGen.genStandSit(0.45, 0.15, 0.05);
                 clock += 1;
             }
 
@@ -167,8 +168,21 @@ public class Robot extends TimedRobot {
 
 
 
-        
-        
+
+        //ACTION THREE IS STEP THE ROBOT FORWARD ONCE.
+        if(pressed3 == 0) {
+            if (clock == 1) { 
+                tGen.step(0.25);
+            }
+            else {
+                clock = 1;
+            }
+        }
+
+
+
+
+
         //SETUP ACTION TWO. IF THE A BUTTON IS PRESSED, STAND.
         if(pressed2) {
             if (clock == 1) {

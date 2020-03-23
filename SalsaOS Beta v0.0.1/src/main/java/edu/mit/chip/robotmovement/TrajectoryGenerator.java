@@ -27,16 +27,149 @@ public class TrajectoryGenerator {
         backRightLeg.clearTrajectory();
     }
 
+    public void trasnferWeight(int direction) {
+        if (direction == 1) {
+            frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            backLeftLeg.addPoint(0.1, 0.45, 0.0);
+            backRightLeg.addPoint(0.1, 0.45, 0.0);
+        }
+        if (direction == -1) {
+            frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
+            frontRightLeg.addPoint(-0.1, 0.45, 0.0);
+            backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            backRightLeg.addPoint(-0.05, 0.5, 0.0);
+        }
+    }
+
+    public void genStep(String leg) {
+        if (leg.equals("FL")) {
+            frontLeftLeg.addPoint(-0.1, 0.35, 0.0);
+            //frontRightLeg.addPoint(-0.1, 0.45, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+
+            frontLeftLeg.addPoint(-0.2, 0.35, 0.0);
+            //frontRightLeg.addPoint(-0.1, 0.45, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+
+            frontLeftLeg.addPoint(-0.2, 0.45, 0.0);
+            //frontRightLeg.addPoint(-0.1, 0.45, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+        }
+
+        if (leg.equals("FR")) {
+            //frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
+            frontRightLeg.addPoint(-0.1, 0.35, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+
+            //frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
+            frontRightLeg.addPoint(-0.2, 0.35, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+
+            //frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
+            frontRightLeg.addPoint(-0.2, 0.45, 0.0);
+            //backLeftLeg.addPoint(-0.05, 0.5, 0.0);
+            //backRightLeg.addPoint(-0.05, 0.5, 0.0);
+        }
+
+        if (leg.equals("BR")) {
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            //backLeftLeg.addPoint(0.1, 0.45, 0.0);
+            backRightLeg.addPoint(0.1, 0.35, 0.0);
+
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            //backLeftLeg.addPoint(0.1, 0.45, 0.0);
+            backRightLeg.addPoint(0.0, 0.35, 0.0);
+
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            //backLeftLeg.addPoint(0.1, 0.45, 0.0);
+            backRightLeg.addPoint(0.0, 0.45, 0.0);
+        }
+
+        if (leg.equals("BL")) {
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            backLeftLeg.addPoint(0.1, 0.35, 0.0);
+            //backRightLeg.addPoint(0.1, 0.45, 0.0);
+
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            backLeftLeg.addPoint(0.0, 0.35, 0.0);
+            //backRightLeg.addPoint(0.1, 0.45, 0.0);
+
+            //frontLeftLeg.addPoint(0.05, 0.5, 0.0);
+            //frontRightLeg.addPoint(0.05, 0.5, 0.0);
+            backLeftLeg.addPoint(0.0, 0.45, 0.0);
+            //backRightLeg.addPoint(0.1, 0.45, 0.0);
+        }
+    }
+
+    public void step(double speed) {
+        //FIRST WE NEED TO TRANSFER THE WEIGHT BACKWARDS
+        trasnferWeight(-1); 
+
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        boolean done = false;
+        while (!done) {
+            done = move(speed/2.0);
+        }
+
+        //TAKE THE STEPS
+        genStep("FL");
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        done = false;
+        while (!done) {
+            done = move(speed);
+        }
+        //TAKE THE STEPS
+        genStep("FR");
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        done = false;
+        while (!done) {
+            done = move(speed);
+        }
+
+        //FIRST WE NEED TO TRANSFER THE WEIGHT FORWARDS NOW
+        trasnferWeight(1); 
+
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        done = false;
+        while (!done) {
+            done = move(speed/2.0);
+        }
+
+        genStep("BL");
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        done = false;
+        while (!done) {
+            done = move(speed);
+        }
+        genStep("BR");
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        done = false;
+        while (!done) {
+            done = move(speed);
+        }
+    }
+
     public void genStandSit(double startingY, double finalY, double offset) {
         frontLeftLeg.addPoint(0.0, startingY, 0.0);
         frontRightLeg.addPoint(0.0, startingY, 0.0);
-        backLeftLeg.addPoint(0.0, startingY+offset, 0.0);
-        backRightLeg.addPoint(0.0, startingY+offset, 0.0);
+        backLeftLeg.addPoint(0.0+offset, startingY+offset, 0.0);
+        backRightLeg.addPoint(0.0+offset, startingY+offset, 0.0);
 
         frontLeftLeg.addPoint(0.0, finalY, 0.0);
         frontRightLeg.addPoint(0.0, finalY, 0.0);
-        backLeftLeg.addPoint(0.0, finalY+offset, 0.0);
-        backRightLeg.addPoint(0.0, finalY+offset, 0.0);
+        backLeftLeg.addPoint(0.0+offset, finalY+offset, 0.0);
+        backRightLeg.addPoint(0.0+offset, finalY+offset, 0.0);
     }
 
     public boolean move(double speed) {
