@@ -61,8 +61,8 @@ public class TrajectoryGenerator {
         }
 
         if (leg.equals("BR")) {
-            backRightLeg.addPoint(0.2, 0.35, 0.0);
-            backRightLeg.addPoint(0.1, 0.35, 0.0);
+            backRightLeg.addPoint(0.2, 0.25, 0.0);
+            backRightLeg.addPoint(0.1, 0.25, 0.0);
             backRightLeg.addPoint(0.1, 0.5, 0.0);
         }
 
@@ -124,6 +124,8 @@ public class TrajectoryGenerator {
 
         lean("C", 1.0);
         //FIRST WE NEED TO TRANSFER THE WEIGHT FORWARDS NOW
+        center();
+        //
         trasnferWeight(1); 
 
         lean("R", 1.0);
@@ -134,6 +136,23 @@ public class TrajectoryGenerator {
         //ACTUALLY MOVE THE ROBOT SLOWLY
 
         lean("C", 1.0);
+
+        center();
+    }
+
+    public void center() {
+        double finalY = 0.45;
+        double offset = 0.05;
+
+        frontLeftLeg.addPoint(0.0, finalY, 0.0);
+        frontRightLeg.addPoint(0.0, finalY, 0.0);
+        backLeftLeg.addPoint(0.0+offset, finalY+offset, 0.0);
+        backRightLeg.addPoint(0.0+offset, finalY+offset, 0.0);
+
+        boolean done = false;
+        while (!done) {
+            done = move(0.05);
+        }
     }
 
     public void genStandSit(double startingY, double finalY, double offset) {
