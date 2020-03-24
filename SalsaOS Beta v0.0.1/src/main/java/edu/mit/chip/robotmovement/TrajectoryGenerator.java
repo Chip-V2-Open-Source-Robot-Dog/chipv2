@@ -54,27 +54,27 @@ public class TrajectoryGenerator {
         BR = backRightLeg.getFootPosition();
 
         if (leg.equals("FL")) {
-            frontLeftLeg.addPoint(-0.1, 0.35, FL.y);
-            frontLeftLeg.addPoint(-0.2, 0.35, FL.y);
-            frontLeftLeg.addPoint(-0.2, 0.45, FL.y);
+            frontLeftLeg.addPoint(-0.1, 0.35, 0.0);
+            frontLeftLeg.addPoint(-0.2, 0.35, 0.0);
+            frontLeftLeg.addPoint(-0.2, 0.45, 0.0);
         }
 
         if (leg.equals("FR")) {
-            frontRightLeg.addPoint(-0.1, 0.35, FR.y);
-            frontRightLeg.addPoint(-0.2, 0.35, FR.y);
-            frontRightLeg.addPoint(-0.2, 0.45, FR.y);
+            frontRightLeg.addPoint(-0.1, 0.35, 0.0);
+            frontRightLeg.addPoint(-0.2, 0.35, 0.0);
+            frontRightLeg.addPoint(-0.2, 0.45, 0.0);
         }
 
         if (leg.equals("BR")) {
-            backRightLeg.addPoint(0.1, 0.35, BR.y);
-            backRightLeg.addPoint(0.0, 0.35, BR.y);
-            backRightLeg.addPoint(0.0, 0.45, BR.y);
+            backRightLeg.addPoint(0.1, 0.35, 0.0);
+            backRightLeg.addPoint(0.0, 0.35, 0.0);
+            backRightLeg.addPoint(0.0, 0.45, 0.0);
         }
 
         if (leg.equals("BL")) {
-            backLeftLeg.addPoint(0.1, 0.35, BL.y);
-            backLeftLeg.addPoint(0.0, 0.35, BL.y);
-            backLeftLeg.addPoint(0.0, 0.45, BL.y);
+            backLeftLeg.addPoint(0.1, 0.35, 0.0);
+            backLeftLeg.addPoint(0.0, 0.35, 0.0);
+            backLeftLeg.addPoint(0.0, 0.45, 0.0);
         }
 
         boolean done = false;
@@ -118,13 +118,13 @@ public class TrajectoryGenerator {
         //FIRST WE NEED TO TRANSFER THE WEIGHT BACKWARDS
         trasnferWeight(-1); 
 
-        lean("R");
-        //TAKE THE STEPS
-        genStep("FL", speed);
-        //ACTUALLY MOVE THE ROBOT SLOWLY
         lean("L");
         //TAKE THE STEPS
         genStep("FR", speed);
+        //ACTUALLY MOVE THE ROBOT SLOWLY
+        lean("R");
+        //TAKE THE STEPS
+        genStep("FL", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
 
         lean("C");
