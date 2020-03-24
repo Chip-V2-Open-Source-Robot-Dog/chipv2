@@ -126,10 +126,10 @@ public class TrajectoryGenerator {
         //FIRST WE NEED TO TRANSFER THE WEIGHT FORWARDS NOW
         trasnferWeight(1); 
 
-        lean("R", 2.5);
+        lean("R", 1.0);
         genStep("BL", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
-        lean("L", 2.5);
+        lean("L", 1.0);
         genStep("BR", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
 
