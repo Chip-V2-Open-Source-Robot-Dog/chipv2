@@ -29,10 +29,10 @@ public class TrajectoryGenerator {
 
     public void trasnferWeight(int direction) {
         if (direction == 1) {
-            frontLeftLeg.addPoint(0.05, 0.5, 0.0);
-            frontRightLeg.addPoint(0.05, 0.5, 0.0);
-            backLeftLeg.addPoint(0.1, 0.45, 0.0);
-            backRightLeg.addPoint(0.1, 0.45, 0.0);
+            frontLeftLeg.addPoint(0.15, 0.5, 0.0);
+            frontRightLeg.addPoint(0.15, 0.5, 0.0);
+            backLeftLeg.addPoint(0.2, 0.45, 0.0);
+            backRightLeg.addPoint(0.2, 0.45, 0.0);
         }
         if (direction == -1) {
             frontLeftLeg.addPoint(-0.1, 0.45, 0.0);
@@ -48,33 +48,28 @@ public class TrajectoryGenerator {
     }
 
     public void genStep(String leg, double speed) {
-        FL = frontLeftLeg.getFootPosition();
-        FR = frontRightLeg.getFootPosition();
-        BL = backLeftLeg.getFootPosition();
-        BR = backRightLeg.getFootPosition();
-
         if (leg.equals("FL")) {
-            frontLeftLeg.addPoint(-0.1, 0.35, 0.0);
-            frontLeftLeg.addPoint(-0.2, 0.35, 0.0);
+            frontLeftLeg.addPoint(-0.1, 0.25, 0.0);
+            frontLeftLeg.addPoint(-0.2, 0.25, 0.0);
             frontLeftLeg.addPoint(-0.2, 0.45, 0.0);
         }
 
         if (leg.equals("FR")) {
-            frontRightLeg.addPoint(-0.1, 0.35, 0.0);
-            frontRightLeg.addPoint(-0.2, 0.35, 0.0);
+            frontRightLeg.addPoint(-0.1, 0.25, 0.0);
+            frontRightLeg.addPoint(-0.2, 0.25, 0.0);
             frontRightLeg.addPoint(-0.2, 0.45, 0.0);
         }
 
         if (leg.equals("BR")) {
+            backRightLeg.addPoint(0.2, 0.35, 0.0);
             backRightLeg.addPoint(0.1, 0.35, 0.0);
-            backRightLeg.addPoint(0.0, 0.35, 0.0);
-            backRightLeg.addPoint(0.0, 0.45, 0.0);
+            backRightLeg.addPoint(0.1, 0.5, 0.0);
         }
 
         if (leg.equals("BL")) {
-            backLeftLeg.addPoint(0.1, 0.35, 0.0);
-            backLeftLeg.addPoint(0.0, 0.35, 0.0);
-            backLeftLeg.addPoint(0.0, 0.45, 0.0);
+            backLeftLeg.addPoint(0.2, 0.25, 0.0);
+            backLeftLeg.addPoint(0.1, 0.25, 0.0);
+            backLeftLeg.addPoint(0.1, 0.5, 0.0);
         }
 
         boolean done = false;
@@ -83,17 +78,17 @@ public class TrajectoryGenerator {
         }
     }
 
-    public void lean(String direction) {
+    public void lean(String direction, double mult) {
         FL = frontLeftLeg.getFootPosition();
         FR = frontRightLeg.getFootPosition();
         BL = backLeftLeg.getFootPosition();
         BR = backRightLeg.getFootPosition();
 
         if (direction.equals("L")) {
-            frontLeftLeg.addPoint(FL.x, FL.y, -0.05);
-            frontRightLeg.addPoint(FR.x, FR.y, 0.05);
-            backLeftLeg.addPoint(BL.x, BL.y, -0.05);
-            backRightLeg.addPoint(BR.x, BR.y, 0.05);
+            frontLeftLeg.addPoint(FL.x, FL.y, -0.05*mult);
+            frontRightLeg.addPoint(FR.x, FR.y, 0.05*mult);
+            backLeftLeg.addPoint(BL.x, BL.y, -0.05*mult);
+            backRightLeg.addPoint(BR.x, BR.y, 0.05*mult);
         }
         if (direction.equals("C")) {
             frontLeftLeg.addPoint(FL.x, FL.y, 0.0);
@@ -102,10 +97,10 @@ public class TrajectoryGenerator {
             backRightLeg.addPoint(BR.x, BR.y, 0.0);
         }
         if (direction.equals("R")) {
-            frontLeftLeg.addPoint(FL.x, FL.y, 0.05);
-            frontRightLeg.addPoint(FR.x, FR.y, -0.05);
-            backLeftLeg.addPoint(BL.x, BL.y, 0.05);
-            backRightLeg.addPoint(BR.x, BR.y, -0.05);
+            frontLeftLeg.addPoint(FL.x, FL.y, 0.05*mult);
+            frontRightLeg.addPoint(FR.x, FR.y, -0.05*mult);
+            backLeftLeg.addPoint(BL.x, BL.y, 0.05*mult);
+            backRightLeg.addPoint(BR.x, BR.y, -0.05*mult);
         }
 
         boolean done = false;
@@ -118,27 +113,27 @@ public class TrajectoryGenerator {
         //FIRST WE NEED TO TRANSFER THE WEIGHT BACKWARDS
         trasnferWeight(-1); 
 
-        lean("L");
+        lean("L", 1.0);
         //TAKE THE STEPS
         genStep("FR", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
-        lean("R");
+        lean("R", 1.0);
         //TAKE THE STEPS
         genStep("FL", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
 
-        lean("C");
+        lean("C", 1.0);
         //FIRST WE NEED TO TRANSFER THE WEIGHT FORWARDS NOW
         trasnferWeight(1); 
 
-        lean("R");
+        lean("R", 2.5);
         genStep("BL", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
-        lean("L");
+        lean("L", 2.5);
         genStep("BR", speed);
         //ACTUALLY MOVE THE ROBOT SLOWLY
 
-        lean("C");
+        lean("C", 1.0);
     }
 
     public void genStandSit(double startingY, double finalY, double offset) {
