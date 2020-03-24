@@ -172,7 +172,7 @@ public class Robot extends TimedRobot {
         //ACTION THREE IS STEP THE ROBOT FORWARD ONCE.
         if(pressed3 == 0) {
             if (clock == 1) { 
-                tGen.step(0.25);
+                tGen.step(0.5);
             }
             else {
                 clock = 1;
