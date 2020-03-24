@@ -152,13 +152,13 @@ public class Robot extends TimedRobot {
         if(pressed) {
             if (clock == 1) {
                 tGen.clearTrajectory();
-                tGen.genStandSit(0.45, 0.15, 0.05);
+                tGen.genStandSit(0.45, 0.15, 0.0);
                 clock += 1;
             }
 
             boolean done = false;
             while (!done) {
-                done = tGen.move(0.25);
+                done = tGen.move(0.1);
             }
             if (done) {
                 clock = 1;
@@ -187,13 +187,13 @@ public class Robot extends TimedRobot {
         if(pressed2) {
             if (clock == 1) {
                 tGen.clearTrajectory();
-                tGen.genStandSit(0.15, 0.45, 0.02);
+                tGen.genStandSit(0.15, 0.45, 0.05);
                 clock += 1;
             }
 
             boolean done = false;
             while (!done) {
-                done = tGen.move(0.25);
+                done = tGen.move(0.1);
             }
             if (done) {
                 clock = 1;
