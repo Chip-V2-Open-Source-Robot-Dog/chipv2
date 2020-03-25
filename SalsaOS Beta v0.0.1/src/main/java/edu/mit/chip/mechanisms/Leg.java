@@ -4,11 +4,19 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.mit.chip.utils.FootPosition;
+import edu.mit.chip.utils.LegModel;
 import edu.mit.chip.utils.LegPosition;
+import edu.mit.chip.utils.LegReversal;
+import edu.mit.chip.utils.LegThetas;
 import edu.mit.chip.utils.PIDConstants;
+import edu.mit.chip.utils.RobotMath;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Leg {
+    public LegModel model;
+    public LegReversal reversal;
+
     public enum JointType {
         SHOULDER,
         HINGE,
@@ -29,10 +37,14 @@ public class Leg {
 
     public CANSparkMax shoulder, hinge, knee;
 
-    public Leg(int shoulderID, int hingeID, int kneeID) {
+    public Leg(LegModel model, int shoulderID, boolean shoulderReverse, int hingeID, boolean hingeReverse, int kneeID, boolean kneeReverse) {
         shoulder =  new CANSparkMax(shoulderID, MotorType.kBrushless);
         hinge =     new CANSparkMax(hingeID,    MotorType.kBrushless);
         knee =      new CANSparkMax(kneeID,     MotorType.kBrushless);
+
+        this.model = model;
+
+        reversal = new LegReversal(shoulderReverse, hingeReverse, kneeReverse);
     }
 
     public void loadPID(PIDConstants shoulderPID, PIDConstants hingePID, PIDConstants kneePID) {
@@ -52,11 +64,16 @@ public class Leg {
     }
 
     public void set(LegPosition legPosition) {
-        set(MotorControlType.POSITION, legPosition.shoulder, legPosition.hinge, legPosition.knee);
+        set(MotorControlType.POSITION, reversal.shoulderMult * legPosition.shoulder, reversal.hingeMult * legPosition.hinge, reversal.kneeMult * legPosition.knee);
     }
 
     public LegPosition getPosition() {
         return new LegPosition(getPosition(JointType.SHOULDER), getPosition(JointType.HINGE), getPosition(JointType.KNEE));
+    }
+
+    public LegThetas getThetas() {
+        LegPosition currentPosition = getPosition();
+        return new LegThetas(RobotMath.calculateTheta(currentPosition.shoulder), RobotMath.calculateTheta(currentPosition.hinge), RobotMath.calculateTheta(currentPosition.knee));
     }
 
     public void setEncoders(LegPosition legPosition) {
@@ -68,11 +85,11 @@ public class Leg {
     public double getPosition(JointType joint) {
         switch (joint) {
             case SHOULDER:
-                return shoulder.getEncoder().getPosition();
+                return reversal.shoulderMult * shoulder.getEncoder().getPosition();
             case HINGE:
-                return hinge.getEncoder().getPosition();
+                return reversal.hingeMult * hinge.getEncoder().getPosition();
             case KNEE:
-                return knee.getEncoder().getPosition();
+                return reversal.kneeMult * knee.getEncoder().getPosition();
         }
         return 0;
     }
@@ -80,13 +97,27 @@ public class Leg {
     public double getVelocity(JointType joint) {
         switch (joint) {
             case SHOULDER:
-                return shoulder.getEncoder().getVelocity();
+                return reversal.shoulderMult * shoulder.getEncoder().getVelocity();
             case HINGE:
-                return hinge.getEncoder().getVelocity();
+                return reversal.hingeMult * hinge.getEncoder().getVelocity();
             case KNEE:
-                return knee.getEncoder().getVelocity();
+                return reversal.kneeMult * knee.getEncoder().getVelocity();
         }
         return 0;
+    }
+
+    //WILL ALSO NEED A CURRENT LEG XYZ POS METHOD (FORWARDS KINEMATICS)
+    public FootPosition getFootPosition() {
+        double l1 = model.L3; //Math.sqrt(L1*L1+L3*L3);
+        double l2 = model.L6; //Math.sqrt(L4*L4+L6*L6);
+        
+        LegThetas thetas = getThetas();
+
+        double xe = l1*Math.cos(thetas.shoulder)-l2*Math.cos(thetas.knee-thetas.shoulder);
+        double ye = l1*Math.sin(thetas.shoulder)+l2*Math.sin(thetas.knee-thetas.shoulder);
+        double ze = ye*Math.sin(thetas.hinge);
+
+        return new FootPosition(xe, ye, ze);
     }
 
     public void updateDashboard(String name) {
