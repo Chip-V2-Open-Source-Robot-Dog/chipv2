@@ -9,15 +9,17 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Networking {
     private static Networking instance;
     private HashMap<String, NetworkTableEntry> entries;
-    private final NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-    private final NetworkTable table = networkTableInstance.getTable("chip");
     
     private Networking(String... entries) {
-        this.entries = new HashMap<String, NetworkTableEntry>();
+        final NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+        final NetworkTable table = networkTableInstance.getTable("chip");
 
+        this.entries = new HashMap<String, NetworkTableEntry>();
         for (String entry : entries) {
             this.entries.put(entry, table.getEntry(entry));
         }
+
+        System.out.println(this.entries);
     }
 
     public static void init(String... entries) {
