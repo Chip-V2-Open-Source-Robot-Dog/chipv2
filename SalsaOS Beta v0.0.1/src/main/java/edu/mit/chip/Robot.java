@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
 
         frontLeftLeg.pushData(networking, "fL");
         frontRightLeg.pushData(networking, "fR");
-        backLeftLeg.pushData(networking, "bR");
+        backLeftLeg.pushData(networking, "bL");
         backRightLeg.pushData(networking, "bR");
     }
     
