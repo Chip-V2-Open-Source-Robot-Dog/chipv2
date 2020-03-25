@@ -20,13 +20,13 @@ public class Networking {
         }
     }
 
-    public static void init(String... tables) {
-        instance = new Networking(tables);
+    public static void init(String... entries) {
+        instance = new Networking(entries);
     }
 
-    public static Networking getInstance(String... tables) {
+    public static Networking getInstance(String... entries) {
         if (instance == null) {
-            init();
+            init(entries);
         }
         return instance;
     }
