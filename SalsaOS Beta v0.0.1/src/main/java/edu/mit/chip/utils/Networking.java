@@ -18,8 +18,6 @@ public class Networking {
         for (String entry : entries) {
             this.entries.put(entry, table.getEntry(entry));
         }
-
-        System.out.println(this.entries);
     }
 
     public static void init(String... entries) {

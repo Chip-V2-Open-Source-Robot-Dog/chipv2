@@ -132,10 +132,10 @@ public class Robot extends TimedRobot {
         backLeftLeg.updateDashboard("Back Left");
         backRightLeg.updateDashboard("Back Right");
 
-        frontLeftLeg.pushData(networking, "fl");
-        frontRightLeg.pushData(networking, "fr");
-        backLeftLeg.pushData(networking, "bl");
-        backRightLeg.pushData(networking, "br");
+        frontLeftLeg.pushData(networking, "fL");
+        frontRightLeg.pushData(networking, "fR");
+        backLeftLeg.pushData(networking, "bR");
+        backRightLeg.pushData(networking, "bR");
     }
     
     /**
