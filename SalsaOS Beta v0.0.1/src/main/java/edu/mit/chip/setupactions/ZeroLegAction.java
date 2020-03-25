@@ -1,7 +1,7 @@
 package edu.mit.chip.setupactions;
 
 import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.utils.LegPosition;
+import edu.mit.chip.leg.LegPosition;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ZeroLegAction extends SetupAction {

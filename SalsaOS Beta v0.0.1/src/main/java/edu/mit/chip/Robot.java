@@ -13,11 +13,14 @@ import edu.mit.chip.setupactions.ZeroLegAction;
 import edu.mit.chip.trajectory.SpeedSet;
 import edu.mit.chip.trajectory.TrajectoryRunner;
 import edu.mit.chip.trajectory.Waypoint;
-import edu.mit.chip.utils.FootPosition;
-import edu.mit.chip.utils.LegModel;
+import edu.mit.chip.leg.FootPosition;
+import edu.mit.chip.leg.LegModel;
+import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -47,6 +50,8 @@ public class Robot extends TimedRobot {
     private TrajectoryRunner trajectoryRunner;
 
     Joystick joy = new Joystick(0);
+
+    private Networking networking;
     
     /**
     * This function is run when the robot code is first started up (or restarted).
@@ -101,6 +106,20 @@ public class Robot extends TimedRobot {
         setupActionChooser.putOnDashboard();
 
         trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+
+        networking = Networking.getInstance(
+            "fL_x", "fL_y", "fL_z",
+            "fR_x", "fR_y", "fR_z",
+            "bL_x", "bL_y", "bL_z",
+            "bR_x", "bR_y", "bR_z",
+
+            "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
+            "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
+            "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
+            "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
+
+            "fL_current", "fR_current", "bL_current", "bR_current"
+        );
     }
     
     /**
@@ -110,9 +129,13 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         frontLeftLeg.updateDashboard("Front Left");
         frontRightLeg.updateDashboard("Front Right");
-        
         backLeftLeg.updateDashboard("Back Left");
         backRightLeg.updateDashboard("Back Right");
+
+        frontLeftLeg.pushData(networking, "fl");
+        frontRightLeg.pushData(networking, "fr");
+        backLeftLeg.pushData(networking, "bl");
+        backRightLeg.pushData(networking, "br");
     }
     
     /**

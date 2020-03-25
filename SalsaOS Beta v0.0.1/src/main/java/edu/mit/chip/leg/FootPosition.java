@@ -1,4 +1,4 @@
-package edu.mit.chip.utils;
+package edu.mit.chip.leg;
 
 public class FootPosition {
     public double x, y, z;

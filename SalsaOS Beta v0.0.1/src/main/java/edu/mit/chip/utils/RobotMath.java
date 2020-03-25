@@ -1,5 +1,9 @@
 package edu.mit.chip.utils;
 
+import edu.mit.chip.leg.LegModel;
+import edu.mit.chip.leg.LegPosition;
+import edu.mit.chip.leg.LegThetas;
+
 public class RobotMath {
     public static LegThetas inverseKinematics(LegModel legModel, double xD, double yD, double zD) {
         double l1 = legModel.L3; //Math.sqrt(L1*L1+L3*L3);

@@ -1,4 +1,4 @@
-package edu.mit.chip.utils;
+package edu.mit.chip.leg;
 
 public class LegModel {
     public double L1;

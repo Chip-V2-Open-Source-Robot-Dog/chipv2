@@ -1,9 +1,9 @@
 package edu.mit.chip.trajectory;
 
 import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.utils.FootPosition;
-import edu.mit.chip.utils.LegPosition;
-import edu.mit.chip.utils.LegThetas;
+import edu.mit.chip.leg.FootPosition;
+import edu.mit.chip.leg.LegPosition;
+import edu.mit.chip.leg.LegThetas;
 import edu.mit.chip.utils.RobotMath;
 
 public class ServoLegCommand {

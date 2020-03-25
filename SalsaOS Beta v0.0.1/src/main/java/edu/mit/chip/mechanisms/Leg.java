@@ -4,11 +4,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.mit.chip.utils.FootPosition;
-import edu.mit.chip.utils.LegModel;
-import edu.mit.chip.utils.LegPosition;
-import edu.mit.chip.utils.LegReversal;
-import edu.mit.chip.utils.LegThetas;
+import edu.mit.chip.leg.FootPosition;
+import edu.mit.chip.leg.LegModel;
+import edu.mit.chip.leg.LegPosition;
+import edu.mit.chip.leg.LegReversal;
+import edu.mit.chip.leg.LegThetas;
+import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.RobotMath;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -128,5 +129,20 @@ public class Leg {
         SmartDashboard.putNumber(name + " - Shoulder Position", getPosition(JointType.SHOULDER));
         SmartDashboard.putNumber(name + " - Hinge Position", getPosition(JointType.HINGE));
         SmartDashboard.putNumber(name + " - Knee Position", getPosition(JointType.KNEE));
+    }
+
+    public void pushData(Networking networking, String prefix) {
+        FootPosition footPosition = getFootPosition();
+        networking.pushDouble(prefix + "_x", footPosition.x);
+        networking.pushDouble(prefix + "_y", footPosition.y);
+        networking.pushDouble(prefix + "_z", footPosition.z);
+
+        LegThetas thetas = getThetas();
+        networking.pushDouble(prefix + "_shoulderTheta", thetas.shoulder);
+        networking.pushDouble(prefix + "_hingeTheta",    thetas.hinge);
+        networking.pushDouble(prefix + "_kneeTheta",     thetas.knee);
+
+        double current = shoulder.getOutputCurrent() + hinge.getOutputCurrent() + knee.getOutputCurrent();
+        networking.pushDouble(prefix + "_current", current);
     }
 }
