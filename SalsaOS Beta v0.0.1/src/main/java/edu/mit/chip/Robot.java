@@ -144,20 +144,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         trajectoryRunner.reset();
-        trajectoryRunner.addWaypoints(
-            new Waypoint(
-                new FootPosition(0.0,  0.47, 0.0),
-                new FootPosition(0.0,  0.47, 0.0),
-                new FootPosition(0.05, 0.5,  0.0),
-                new FootPosition(0.05, 0.5,  0.0)
-            ),
-            new Waypoint(
-                new FootPosition(0.0,  0.2, 0.0),
-                new FootPosition(0.0,  0.2, 0.0),
-                new FootPosition(0.05, 0.2, 0.0),
-                new FootPosition(0.05, 0.2, 0.0)
-            )
-        );        
+                
     }
     
     /**
