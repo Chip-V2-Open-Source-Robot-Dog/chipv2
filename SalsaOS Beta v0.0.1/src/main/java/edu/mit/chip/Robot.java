@@ -143,8 +143,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        trajectoryRunner.reset();
-                
+        trajectoryRunner.reset();    
     }
     
     /**
