@@ -142,7 +142,7 @@ public class Leg {
         networking.pushDouble(prefix + "_hingeTheta",    thetas.hinge);
         networking.pushDouble(prefix + "_kneeTheta",     thetas.knee);
 
-        double current = shoulder.getOutputCurrent() + hinge.getOutputCurrent() + knee.getOutputCurrent();
+        double current = Math.abs(shoulder.getOutputCurrent()) + Math.abs(hinge.getOutputCurrent()) + Math.abs(knee.getOutputCurrent());
         networking.pushDouble(prefix + "_current", current);
     }
 }
