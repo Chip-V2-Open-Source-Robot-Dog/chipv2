@@ -8,30 +8,44 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Networking {
     private static Networking instance;
-    private HashMap<String, NetworkTableEntry> entries;
+
+    private HashMap<String, NetworkTableEntry> readoutEntries;
+    private HashMap<String, NetworkTableEntry> inputEntries;
+
+    final NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+    final NetworkTable readoutTable = networkTableInstance.getTable("rio_readout");
+    final NetworkTable inputTable = networkTableInstance.getTable("rio_input");
     
-    private Networking(String... entries) {
-        final NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
-        final NetworkTable table = networkTableInstance.getTable("chip");
+    private Networking() {
+        readoutEntries = new HashMap<String, NetworkTableEntry>();
+        inputEntries = new HashMap<String, NetworkTableEntry>();
+    }
 
-        this.entries = new HashMap<String, NetworkTableEntry>();
-        for (String entry : entries) {
-            this.entries.put(entry, table.getEntry(entry));
+    public void addReadouts(String... readoutEntries) {
+        for (String entryName : readoutEntries) {
+            this.readoutEntries.put(entryName, readoutTable.getEntry(entryName));
         }
     }
 
-    public static void init(String... entries) {
-        instance = new Networking(entries);
+    public void addInputs(String... inputEntries) {
+        for (String entryName : inputEntries) {
+            this.inputEntries.put(entryName, inputTable.getEntry(entryName));
+        }
     }
 
-    public static Networking getInstance(String... entries) {
+    public static Networking getInstance() {
         if (instance == null) {
-            init(entries);
+            instance = new Networking();
         }
+
         return instance;
     }
 
     public void pushDouble(String entry, double value) {
-        entries.get(entry).setDouble(value);
+        readoutEntries.get(entry).setDouble(value);
+    }
+
+    public void pullDouble(String entry, double defaultValue) {
+        inputEntries.get(entry).getDouble(defaultValue);
     }
 }

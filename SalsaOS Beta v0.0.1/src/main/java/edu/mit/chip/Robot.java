@@ -107,7 +107,8 @@ public class Robot extends TimedRobot {
 
         trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
 
-        networking = Networking.getInstance(
+        networking = Networking.getInstance();
+        networking.addReadouts(
             "fL_x", "fL_y", "fL_z",
             "fR_x", "fR_y", "fR_z",
             "bL_x", "bL_y", "bL_z",
@@ -119,6 +120,13 @@ public class Robot extends TimedRobot {
             "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
 
             "fL_current", "fR_current", "bL_current", "bR_current"
+        );
+
+        networking.addInputs(
+            "fL_x", "fL_y", "fL_z",
+            "fR_x", "fR_y", "fR_z",
+            "bL_x", "bL_y", "bL_z",
+            "bR_x", "bR_y", "bR_z"
         );
     }
     
