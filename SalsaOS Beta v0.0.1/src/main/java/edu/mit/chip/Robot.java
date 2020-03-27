@@ -47,8 +47,9 @@ public class Robot extends TimedRobot {
 
     // private TrajectoryRunner trajectoryRunner;
 
+    protected final Leg[] legs = {frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg};
     protected final LegType[] legTypes = {LegType.FRONT_LEFT, LegType.FRONT_RIGHT, LegType.BACK_LEFT,LegType.BACK_RIGHT};
-    protected final FootPosition defaultFootPosition = new FootPosition(0, 0, 0);
+    protected final FootPosition defaultFootPosition = new FootPosition(0, 0.15, 0);
     protected SetpointManager setpointManager;
 
     Joystick joy = new Joystick(0);
@@ -130,6 +131,13 @@ public class Robot extends TimedRobot {
                 "bL_x", "bL_y", "bL_z",
                 "bR_x", "bR_y", "bR_z"
             );
+            
+            for (LegType legType : legTypes) {
+                networking.initInput(legType.prefix + "_x", this.defaultFootPosition.x);
+                networking.initInput(legType.prefix + "_y", this.defaultFootPosition.y);
+                networking.initInput(legType.prefix + "_z", this.defaultFootPosition.z);
+            }
+
 
             while (true) {
                 this.frontLeftLeg.updateDashboard("Front Left");

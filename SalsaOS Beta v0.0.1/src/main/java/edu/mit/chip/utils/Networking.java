@@ -45,6 +45,10 @@ public class Networking {
         readoutEntries.get(entry).setDouble(value);
     }
 
+    public void initInput(String entry, double value) {
+        inputEntries.get(entry).getDouble(value);
+    }
+
     public double pullDouble(String entry, double defaultValue) {
         return inputEntries.get(entry).getDouble(defaultValue);
     }
