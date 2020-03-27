@@ -10,91 +10,93 @@ package edu.mit.chip;
 import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.setupactions.SetupActionChooser;
 import edu.mit.chip.setupactions.ZeroLegAction;
-import edu.mit.chip.trajectory.SpeedSet;
-import edu.mit.chip.trajectory.TrajectoryRunner;
-import edu.mit.chip.trajectory.Waypoint;
+import edu.mit.chip.setpoint.SetpointManager;
 import edu.mit.chip.leg.FootPosition;
 import edu.mit.chip.leg.LegModel;
+import edu.mit.chip.leg.LegType;
 import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
+import edu.mit.chip.utils.SpeedSet;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
-* The VM is configured to automatically run this class, and to call the
-* functions corresponding to each mode, as described in the TimedRobot
-* documentation. If you change the name of this class or the package after
-* creating this project, you must also update the build.gradle file in the
-* project.
-*/
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
+ * project.
+ */
 public class Robot extends TimedRobot {
     public Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
 
     private SetupActionChooser setupActionChooser;
-    
+
     private final double kP = 0.1;
     private final double kI = 0.0005;
     private final double kD = 0.01;
-    
+
     private final double kIz = 0;
     private final double kFF = 0;
-    
-    private final double kMaxOutput =  1.0;
+
+    private final double kMaxOutput = 1.0;
     private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
-    
-    private TrajectoryRunner trajectoryRunner;
+
+    // private TrajectoryRunner trajectoryRunner;
+
+    protected final LegType[] legTypes = {LegType.FRONT_LEFT, LegType.FRONT_RIGHT, LegType.BACK_LEFT,LegType.BACK_RIGHT};
+    protected final FootPosition defaultFootPosition = new FootPosition(0, 0, 0);
+    protected SetpointManager setpointManager;
 
     Joystick joy = new Joystick(0);
 
-    private Networking networking;
-    
+    private Thread networkingThread;
+
     /**
-    * This function is run when the robot code is first started up (or restarted).
-    */
+     * This function is run when the robot code is first started up (or restarted).
+     */
     @Override
-    public void robotInit() {        
+    public void robotInit() {
         System.out.println("Initializing robot...");
         System.out.println("Attempting to construct legs.");
 
         LegModel leftLegs = new LegModel(0.055, 0.075, 0.235, 0.1, 0.03, 0.32);
         LegModel rightLegs = new LegModel(0.055, -0.075, 0.235, 0.1, -0.03, 0.32);
-                
-        frontLeftLeg  = new Leg(leftLegs,   3,  true,  2, false,  1, false);
-        frontRightLeg = new Leg(rightLegs, 12, false, 10,  true, 11,  true);
-        backLeftLeg   = new Leg(leftLegs,   4,  true,  6, false,  5, false);
-        backRightLeg  = new Leg(rightLegs,  9, false,  7,  true,  8,  true);
-        
+
+        frontLeftLeg = new Leg(leftLegs, 3, true, 2, false, 1, false);
+        frontRightLeg = new Leg(rightLegs, 12, false, 10, true, 11, true);
+        backLeftLeg = new Leg(leftLegs, 4, true, 6, false, 5, false);
+        backRightLeg = new Leg(rightLegs, 9, false, 7, true, 8, true);
+
         System.out.println("Legs constructed.");
-        
+
         frontLeftLeg.loadPID(
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-        
+
         frontRightLeg.loadPID(
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-        
+
         backLeftLeg.loadPID(
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-        
+
         backRightLeg.loadPID(
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
             new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
         );
-        
+
         System.out.println("Robot initialized.");
 
         setupActionChooser = new SetupActionChooser(
@@ -105,29 +107,57 @@ public class Robot extends TimedRobot {
         );
         setupActionChooser.putOnDashboard();
 
-        trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+        // trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
 
-        networking = Networking.getInstance();
-        networking.addReadouts(
-            "fL_x", "fL_y", "fL_z",
-            "fR_x", "fR_y", "fR_z",
-            "bL_x", "bL_y", "bL_z",
-            "bR_x", "bR_y", "bR_z",
+        networkingThread = new Thread(() -> {
+            Networking networking = Networking.getInstance();
+            networking.addReadouts(
+                "fL_x", "fL_y", "fL_z",
+                "fR_x", "fR_y", "fR_z",
+                "bL_x", "bL_y", "bL_z",
+                "bR_x", "bR_y", "bR_z",
 
-            "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
-            "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
-            "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
-            "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
+                "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
+                "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
+                "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
+                "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
 
-            "fL_current", "fR_current", "bL_current", "bR_current"
-        );
+                "fL_current", "fR_current", "bL_current", "bR_current"
+            );
+            networking.addInputs(
+                "fL_x", "fL_y", "fL_z",
+                "fR_x", "fR_y", "fR_z",
+                "bL_x", "bL_y", "bL_z",
+                "bR_x", "bR_y", "bR_z"
+            );
 
-        networking.addInputs(
-            "fL_x", "fL_y", "fL_z",
-            "fR_x", "fR_y", "fR_z",
-            "bL_x", "bL_y", "bL_z",
-            "bR_x", "bR_y", "bR_z"
-        );
+            while (true) {
+                this.frontLeftLeg.updateDashboard("Front Left");
+                this.frontRightLeg.updateDashboard("Front Right");
+                this.backLeftLeg.updateDashboard("Back Left");
+                this.backRightLeg.updateDashboard("Back Right");
+
+                this.frontLeftLeg.pushData(networking, "fL");
+                this.frontRightLeg.pushData(networking, "fR");
+                this.backLeftLeg.pushData(networking, "bL");
+                this.backRightLeg.pushData(networking, "bR");
+
+                for (LegType legType : legTypes) {
+                    this.setpointManager.updateSetpoint(legType,
+                        networking.pullDouble(legType.prefix + "_x", this.defaultFootPosition.x),
+                        networking.pullDouble(legType.prefix + "_y", this.defaultFootPosition.y),
+                        networking.pullDouble(legType.prefix + "_z", this.defaultFootPosition.z)
+                    );
+                }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        networkingThread.start();
     }
     
     /**
@@ -135,15 +165,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void robotPeriodic() {
-        frontLeftLeg.updateDashboard("Front Left");
-        frontRightLeg.updateDashboard("Front Right");
-        backLeftLeg.updateDashboard("Back Left");
-        backRightLeg.updateDashboard("Back Right");
 
-        frontLeftLeg.pushData(networking, "fL");
-        frontRightLeg.pushData(networking, "fR");
-        backLeftLeg.pushData(networking, "bL");
-        backRightLeg.pushData(networking, "bR");
     }
     
     /**
@@ -151,7 +173,8 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        trajectoryRunner.reset();    
+        // trajectoryRunner.reset();
+        setpointManager = new SetpointManager(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
     }
     
     /**
@@ -159,7 +182,8 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        trajectoryRunner.tick();
+        // trajectoryRunner.tick();
+        setpointManager.tick();
     }
     
     /**

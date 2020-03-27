@@ -45,7 +45,7 @@ public class Networking {
         readoutEntries.get(entry).setDouble(value);
     }
 
-    public void pullDouble(String entry, double defaultValue) {
-        inputEntries.get(entry).getDouble(defaultValue);
+    public double pullDouble(String entry, double defaultValue) {
+        return inputEntries.get(entry).getDouble(defaultValue);
     }
 }

@@ -1,10 +1,10 @@
-package edu.mit.chip.trajectory;
+package edu.mit.chip.utils;
 
 public class SpeedSet {
-    double frontLeft;
-    double frontRight;
-    double backLeft;
-    double backRight;
+    public double frontLeft;
+    public double frontRight;
+    public double backLeft;
+    public double backRight;
 
     public SpeedSet(double frontLeft, double frontRight, double backLeft, double backRight) {
         this.frontLeft = frontLeft;
