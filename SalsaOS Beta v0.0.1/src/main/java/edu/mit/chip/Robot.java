@@ -122,10 +122,6 @@ public class Robot extends TimedRobot {
             networking.addInputs(
                 legType.key("x"), legType.key("y"), legType.key("z")
             );
-
-            networking.initInput(legType.key("x"), this.defaultFootPosition.x);
-            networking.initInput(legType.key("y"), this.defaultFootPosition.y);
-            networking.initInput(legType.key("z"), this.defaultFootPosition.z);
         }
     }
     
@@ -149,6 +145,11 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         // trajectoryRunner.reset();
         setpointManager = new SetpointManager(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+        for (LegType legType : legTypes) {
+            networking.initInput(legType.key("x"), defaultFootPosition.x);
+            networking.initInput(legType.key("y"), defaultFootPosition.y);
+            networking.initInput(legType.key("z"), defaultFootPosition.z);
+        }
         pullSetpoint();
         setpointManager.resume();
     }
