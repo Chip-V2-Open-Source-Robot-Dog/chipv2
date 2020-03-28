@@ -48,7 +48,8 @@ public class Robot extends TimedRobot {
     // private TrajectoryRunner trajectoryRunner;
 
     protected final Leg[] legs = {frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg};
-    protected final LegType[] legTypes = {LegType.FRONT_LEFT, LegType.FRONT_RIGHT, LegType.BACK_LEFT,LegType.BACK_RIGHT};
+    protected final LegType[] legTypes = {LegType.FRONT_LEFT, LegType.FRONT_RIGHT, LegType.BACK_LEFT, LegType.BACK_RIGHT};
+
     protected final FootPosition defaultFootPosition = new FootPosition(0, 0.15, 0);
     protected SetpointManager setpointManager;
 
@@ -133,15 +134,12 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void robotPeriodic() {
-        this.frontLeftLeg.updateDashboard("Front Left");
-        this.frontRightLeg.updateDashboard("Front Right");
-        this.backLeftLeg.updateDashboard("Back Left");
-        this.backRightLeg.updateDashboard("Back Right");
+        for (LegType legType : legTypes) {
+            Leg leg = getLeg(legType);
 
-        this.frontLeftLeg.pushData(networking, "fL");
-        this.frontRightLeg.pushData(networking, "fR");
-        this.backLeftLeg.pushData(networking, "bL");
-        this.backRightLeg.pushData(networking, "bR");
+            leg.updateDashboard(legType.name);
+            leg.pushData(networking, legType.prefix);
+        }
     }
     
     /**
@@ -195,6 +193,21 @@ public class Robot extends TimedRobot {
         frontRightLeg.neutral();
         backLeftLeg.neutral();
         backRightLeg.neutral();
+    }
+
+    public Leg getLeg(LegType type) {
+        if (type == LegType.FRONT_LEFT) {
+            return frontLeftLeg;
+        }
+        else if (type == LegType.FRONT_RIGHT) {
+            return frontRightLeg;
+        }
+        else if (type == LegType.BACK_LEFT) {
+            return backLeftLeg;
+        }
+        else {
+            return backRightLeg;
+        }
     }
 
     public void pullSetpoint() {

@@ -1,13 +1,14 @@
 package edu.mit.chip.leg;
 
 public enum LegType {
-    FRONT_LEFT("fL"),
-    FRONT_RIGHT("fR"),
-    BACK_LEFT("bL"),
-    BACK_RIGHT("bR");
+    FRONT_LEFT("Front Left", "fL"),
+    FRONT_RIGHT("Front Right", "fR"),
+    BACK_LEFT("Back Left", "bL"),
+    BACK_RIGHT("Back Right", "bR");
     
-    public String prefix;
-    private LegType(String prefix) {
+    public String name, prefix;
+    private LegType(String name, String prefix) {
+        this.name = name;
         this.prefix = prefix;
     }
 
