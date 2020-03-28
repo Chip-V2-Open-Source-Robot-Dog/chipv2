@@ -112,30 +112,19 @@ public class Robot extends TimedRobot {
         // trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
 
         networking = Networking.getInstance();
-        networking.addReadouts(
-            "fL_x", "fL_y", "fL_z",
-            "fR_x", "fR_y", "fR_z",
-            "bL_x", "bL_y", "bL_z",
-            "bR_x", "bR_y", "bR_z",
-
-            "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
-            "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
-            "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
-            "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
-
-            "fL_current", "fR_current", "bL_current", "bR_current"
-        );
-        networking.addInputs(
-            "fL_x", "fL_y", "fL_z",
-            "fR_x", "fR_y", "fR_z",
-            "bL_x", "bL_y", "bL_z",
-            "bR_x", "bR_y", "bR_z"
-        );
-        
         for (LegType legType : legTypes) {
-            networking.initInput(legType.prefix + "_x", this.defaultFootPosition.x);
-            networking.initInput(legType.prefix + "_y", this.defaultFootPosition.y);
-            networking.initInput(legType.prefix + "_z", this.defaultFootPosition.z);
+            networking.addReadouts(
+                legType.key("x"), legType.key("y"), legType.key("z"),
+                legType.key("shoulderTheta"), legType.key("hingeTheta"), legType.key("kneeTheta"),
+                legType.key("current")
+            );
+            networking.addInputs(
+                legType.key("x"), legType.key("y"), legType.key("z")
+            );
+
+            networking.initInput(legType.key("x"), this.defaultFootPosition.x);
+            networking.initInput(legType.key("y"), this.defaultFootPosition.y);
+            networking.initInput(legType.key("z"), this.defaultFootPosition.z);
         }
     }
     
@@ -211,9 +200,9 @@ public class Robot extends TimedRobot {
     public void pullSetpoint() {
         for (LegType legType : legTypes) {
             this.setpointManager.updateSetpoint(legType,
-                networking.pullDouble(legType.prefix + "_x", this.defaultFootPosition.x),
-                networking.pullDouble(legType.prefix + "_y", this.defaultFootPosition.y),
-                networking.pullDouble(legType.prefix + "_z", this.defaultFootPosition.z)
+                networking.pullInput(legType.prefix + "_x", this.defaultFootPosition.x),
+                networking.pullInput(legType.prefix + "_y", this.defaultFootPosition.y),
+                networking.pullInput(legType.prefix + "_z", this.defaultFootPosition.z)
             );
         }
     }

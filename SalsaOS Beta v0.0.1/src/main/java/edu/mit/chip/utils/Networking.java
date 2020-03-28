@@ -41,15 +41,15 @@ public class Networking {
         return instance;
     }
 
-    public void pushDouble(String entry, double value) {
+    public void pushReadout(String entry, double value) {
         readoutEntries.get(entry).setDouble(value);
     }
 
     public void initInput(String entry, double value) {
-        inputEntries.get(entry).getDouble(value);
+        inputEntries.get(entry).setDouble(value);
     }
 
-    public double pullDouble(String entry, double defaultValue) {
+    public double pullInput(String entry, double defaultValue) {
         return inputEntries.get(entry).getDouble(defaultValue);
     }
 }

@@ -133,16 +133,16 @@ public class Leg {
 
     public void pushData(Networking networking, String prefix) {
         FootPosition footPosition = getFootPosition();
-        networking.pushDouble(prefix + "_x", footPosition.x);
-        networking.pushDouble(prefix + "_y", footPosition.y);
-        networking.pushDouble(prefix + "_z", footPosition.z);
+        networking.pushReadout(prefix + "_x", footPosition.x);
+        networking.pushReadout(prefix + "_y", footPosition.y);
+        networking.pushReadout(prefix + "_z", footPosition.z);
 
         LegThetas thetas = getThetas();
-        networking.pushDouble(prefix + "_shoulderTheta", thetas.shoulder);
-        networking.pushDouble(prefix + "_hingeTheta",    thetas.hinge);
-        networking.pushDouble(prefix + "_kneeTheta",     thetas.knee);
+        networking.pushReadout(prefix + "_shoulderTheta", thetas.shoulder);
+        networking.pushReadout(prefix + "_hingeTheta",    thetas.hinge);
+        networking.pushReadout(prefix + "_kneeTheta",     thetas.knee);
 
         double current = Math.abs(shoulder.getOutputCurrent()) + Math.abs(hinge.getOutputCurrent()) + Math.abs(knee.getOutputCurrent());
-        networking.pushDouble(prefix + "_current", current);
+        networking.pushReadout(prefix + "_current", current);
     }
 }
