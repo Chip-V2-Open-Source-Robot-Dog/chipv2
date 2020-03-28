@@ -1,18 +1,18 @@
-package edu.mit.chip.trajectory;
+package edu.mit.chip.setpoint;
 
 import edu.mit.chip.mechanisms.Leg;
 import edu.mit.chip.leg.FootPosition;
 import edu.mit.chip.leg.LegPosition;
 import edu.mit.chip.leg.LegThetas;
+import edu.mit.chip.utils.ChipCommand;
 import edu.mit.chip.utils.RobotMath;
 
-public class ServoLegCommand {
+public class HoldSetpointCommand extends ChipCommand{
     private final double MAX_ERROR = 0.1;
 
     private Leg leg;
     private double maxSpeed;
 
-    private FootPosition targetFootPosition;
     private LegPosition targetLegPosition;
 
     private LegPosition legPosition;
@@ -22,53 +22,32 @@ public class ServoLegCommand {
     private boolean hingeAtTarget = false;
     private boolean kneeAtTarget = false;
 
-    private State state;
+    public HoldSetpointCommand(Leg leg, double maxSpeed) {
+        super();
 
-    public ServoLegCommand(Leg leg, FootPosition targetPosition, double maxSpeed) {
         this.leg = leg;
-        this.targetFootPosition = targetPosition;
         this.maxSpeed = maxSpeed;
 
-        state = State.INITIALIZING;
-    }
-
-    private enum State {
-        INITIALIZING,
-        EXECUTING,
-        ENDING,
-        DONE;
-    }
-
-    public void tick() {
-        switch (state) {
-            case INITIALIZING:
-                initialize();
-                state = State.EXECUTING;
-                break;
-            case EXECUTING:
-                execute();
-                if (isFinished())
-                    state = State.ENDING;
-                break;
-            case ENDING:
-                end();
-                state = State.DONE;
-                break;
-            case DONE:
-                break;
-        }
+        final FootPosition currentPosition = leg.getFootPosition();
+        setTarget(currentPosition.x, currentPosition.y, currentPosition.z);
     }
 
     public boolean isDone() {
         return state == State.DONE;
     }
 
-    private void initialize() {
-        final LegThetas thetas = RobotMath.inverseKinematics(leg.model, targetFootPosition.x, targetFootPosition.y, targetFootPosition.z);
+    public void setTarget(double x, double y, double z) {
+        final LegThetas thetas = RobotMath.inverseKinematics(leg.model, x, y, z);
         targetLegPosition = RobotMath.calculateLegPosition(thetas);
+    } 
+
+    @Override
+    protected void initialize() {
+        
     }
 
-    private void execute() {
+    @Override
+    protected void execute() {
         legPosition = leg.getPosition();
 
         error = targetLegPosition.shoulder - legPosition.shoulder;
@@ -98,11 +77,13 @@ public class ServoLegCommand {
         leg.set(legPosition);
     }
 
-    private boolean isFinished() {
-        return shoulderAtTarget && hingeAtTarget && kneeAtTarget;
+    @Override
+    protected boolean isFinished() {
+        return false;
     }
 
-    private void end() {
+    @Override
+    protected void end() {
         leg.set(targetLegPosition);
     }
 }

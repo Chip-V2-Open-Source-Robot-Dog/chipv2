@@ -1,6 +1,6 @@
 package edu.mit.chip.trajectory;
 
-import edu.mit.chip.utils.FootPosition;
+import edu.mit.chip.leg.FootPosition;
 
 public class Waypoint {
     FootPosition frontLeft;

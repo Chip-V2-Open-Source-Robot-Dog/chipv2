@@ -3,6 +3,7 @@ package edu.mit.chip.trajectory;
 import java.util.ArrayList;
 
 import edu.mit.chip.Robot;
+import edu.mit.chip.utils.SpeedSet;
 
 public class TrajectoryRunner {
     public enum State {
