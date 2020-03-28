@@ -54,7 +54,8 @@ public class Robot extends TimedRobot {
 
     Joystick joy = new Joystick(0);
 
-    private Thread networkingThread;
+    private Networking networking;
+    // private Thread networkingThread;
 
     /**
      * This function is run when the robot code is first started up (or restarted).
@@ -110,62 +111,32 @@ public class Robot extends TimedRobot {
 
         // trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
 
-        networkingThread = new Thread(() -> {
-            Networking networking = Networking.getInstance();
-            networking.addReadouts(
-                "fL_x", "fL_y", "fL_z",
-                "fR_x", "fR_y", "fR_z",
-                "bL_x", "bL_y", "bL_z",
-                "bR_x", "bR_y", "bR_z",
+        networking = Networking.getInstance();
+        networking.addReadouts(
+            "fL_x", "fL_y", "fL_z",
+            "fR_x", "fR_y", "fR_z",
+            "bL_x", "bL_y", "bL_z",
+            "bR_x", "bR_y", "bR_z",
 
-                "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
-                "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
-                "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
-                "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
+            "fL_shoulderTheta", "fL_hingeTheta", "fL_kneeTheta",
+            "fR_shoulderTheta", "fR_hingeTheta", "fR_kneeTheta",
+            "bL_shoulderTheta", "bL_hingeTheta", "bL_kneeTheta",
+            "bR_shoulderTheta", "bR_hingeTheta", "bR_kneeTheta",
 
-                "fL_current", "fR_current", "bL_current", "bR_current"
-            );
-            networking.addInputs(
-                "fL_x", "fL_y", "fL_z",
-                "fR_x", "fR_y", "fR_z",
-                "bL_x", "bL_y", "bL_z",
-                "bR_x", "bR_y", "bR_z"
-            );
-            
-            for (LegType legType : legTypes) {
-                networking.initInput(legType.prefix + "_x", this.defaultFootPosition.x);
-                networking.initInput(legType.prefix + "_y", this.defaultFootPosition.y);
-                networking.initInput(legType.prefix + "_z", this.defaultFootPosition.z);
-            }
-
-
-            while (true) {
-                this.frontLeftLeg.updateDashboard("Front Left");
-                this.frontRightLeg.updateDashboard("Front Right");
-                this.backLeftLeg.updateDashboard("Back Left");
-                this.backRightLeg.updateDashboard("Back Right");
-
-                this.frontLeftLeg.pushData(networking, "fL");
-                this.frontRightLeg.pushData(networking, "fR");
-                this.backLeftLeg.pushData(networking, "bL");
-                this.backRightLeg.pushData(networking, "bR");
-
-                for (LegType legType : legTypes) {
-                    this.setpointManager.updateSetpoint(legType,
-                        networking.pullDouble(legType.prefix + "_x", this.defaultFootPosition.x),
-                        networking.pullDouble(legType.prefix + "_y", this.defaultFootPosition.y),
-                        networking.pullDouble(legType.prefix + "_z", this.defaultFootPosition.z)
-                    );
-                }
-
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        networkingThread.start();
+            "fL_current", "fR_current", "bL_current", "bR_current"
+        );
+        networking.addInputs(
+            "fL_x", "fL_y", "fL_z",
+            "fR_x", "fR_y", "fR_z",
+            "bL_x", "bL_y", "bL_z",
+            "bR_x", "bR_y", "bR_z"
+        );
+        
+        for (LegType legType : legTypes) {
+            networking.initInput(legType.prefix + "_x", this.defaultFootPosition.x);
+            networking.initInput(legType.prefix + "_y", this.defaultFootPosition.y);
+            networking.initInput(legType.prefix + "_z", this.defaultFootPosition.z);
+        }
     }
     
     /**
@@ -173,7 +144,15 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void robotPeriodic() {
+        this.frontLeftLeg.updateDashboard("Front Left");
+        this.frontRightLeg.updateDashboard("Front Right");
+        this.backLeftLeg.updateDashboard("Back Left");
+        this.backRightLeg.updateDashboard("Back Right");
 
+        this.frontLeftLeg.pushData(networking, "fL");
+        this.frontRightLeg.pushData(networking, "fR");
+        this.backLeftLeg.pushData(networking, "bL");
+        this.backRightLeg.pushData(networking, "bR");
     }
     
     /**
@@ -183,6 +162,8 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         // trajectoryRunner.reset();
         setpointManager = new SetpointManager(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+        pullSetpoint();
+        setpointManager.resume();
     }
     
     /**
@@ -191,6 +172,8 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         // trajectoryRunner.tick();
+
+        pullSetpoint();
         setpointManager.tick();
     }
     
@@ -223,5 +206,15 @@ public class Robot extends TimedRobot {
         frontRightLeg.neutral();
         backLeftLeg.neutral();
         backRightLeg.neutral();
+    }
+
+    public void pullSetpoint() {
+        for (LegType legType : legTypes) {
+            this.setpointManager.updateSetpoint(legType,
+                networking.pullDouble(legType.prefix + "_x", this.defaultFootPosition.x),
+                networking.pullDouble(legType.prefix + "_y", this.defaultFootPosition.y),
+                networking.pullDouble(legType.prefix + "_z", this.defaultFootPosition.z)
+            );
+        }
     }
 }
