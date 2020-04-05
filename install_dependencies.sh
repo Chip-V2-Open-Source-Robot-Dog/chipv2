@@ -23,7 +23,4 @@ sudo apt install python-pip -y
 pip install simple-pid
 pip install pynetworktables==2018.2.0
 pip install numpy
-pip install enum
-
-
 
