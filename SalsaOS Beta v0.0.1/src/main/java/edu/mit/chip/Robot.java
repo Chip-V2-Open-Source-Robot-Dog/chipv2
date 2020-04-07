@@ -144,7 +144,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         // trajectoryRunner.reset();
-        setpointManager = new SetpointManager(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
+        setpointManager = new SetpointManager(this, new SpeedSet(1.0, 1.0, 1.0, 1.0));
         for (LegType legType : legTypes) {
             networking.initInput(legType.key("x"), defaultFootPosition.x);
             networking.initInput(legType.key("y"), defaultFootPosition.y);
