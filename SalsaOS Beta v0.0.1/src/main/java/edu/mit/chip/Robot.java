@@ -17,6 +17,7 @@ import edu.mit.chip.leg.LegType;
 import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.SpeedSet;
+import edu.mit.chip.utils.DS;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -57,6 +58,8 @@ public class Robot extends TimedRobot {
 
     private Networking networking;
     // private Thread networkingThread;
+
+    private DS DS = new DS();
 
     /**
      * This function is run when the robot code is first started up (or restarted).
@@ -123,6 +126,8 @@ public class Robot extends TimedRobot {
                 legType.key("x"), legType.key("y"), legType.key("z")
             );
         }
+        //ENABLE THE ROBOT WITH DS
+        DS.start();
     }
     
     /**
