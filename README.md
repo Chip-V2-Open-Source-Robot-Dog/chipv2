@@ -3,7 +3,7 @@
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/Chip-V2-Open-Source-Robot-Dog/chipv2) ![GitHub Release Date](https://img.shields.io/github/release-date/Chip-V2-Open-Source-Robot-Dog/chipv2) ![GitHub contributors](https://img.shields.io/github/contributors/Chip-V2-Open-Source-Robot-Dog/chipv2)
 
-![GitHub language count](https://img.shields.io/github/languages/count/Chip-V2-Open-Source-Robot-Dog/chipv2)
+![GitHub language count](https://img.shields.io/github/languages/count/Chip-V2-Open-Source-Robot-Dog/chipv2) ![GitHub repo size](https://img.shields.io/github/repo-size/Chip-V2-Open-Source-Robot-Dog/chipv2)
 
 Repository for the Chip V2 open source robot dog.
 
