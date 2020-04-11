@@ -4,5 +4,8 @@
 Repository for the Chip V2 open source robot dog.
 
 
-[![License: CC BY-NC-SA 4.0](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/) this project is licensed by a [Creative Commons Attribution-NonCommercial ShareAlike 4.0 International License.][CC BY-NC-SA]
 
+
+This project is licensed by a [Creative Commons Attribution-NonCommercial ShareAlike 4.0 International License.][CC BY-NC-SA]
+
+[![License: CC BY-NC-SA 4.0](https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
