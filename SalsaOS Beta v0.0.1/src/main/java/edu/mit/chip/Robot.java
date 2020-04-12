@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
 
     private SetupActionChooser setupActionChooser;
 
-    private final double kP = 0.1;
-    private final double kI = 0.0005;
+    private final double kP = 0.2;
+    private final double kI = 0.005;
     private final double kD = 0.01;
 
     private final double kIz = 0;
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         // trajectoryRunner.reset();
-        setpointManager = new SetpointManager(this, new SpeedSet(1.0, 1.0, 1.0, 1.0));
+        setpointManager = new SetpointManager(this, new SpeedSet(0.7, 0.7, 0.7, 0.7));
         for (LegType legType : legTypes) {
             networking.initInput(legType.key("x"), defaultFootPosition.x);
             networking.initInput(legType.key("y"), defaultFootPosition.y);
