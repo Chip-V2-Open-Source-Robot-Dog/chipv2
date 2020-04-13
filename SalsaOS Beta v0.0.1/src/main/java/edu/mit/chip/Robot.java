@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
 
     private SetupActionChooser setupActionChooser;
 
-    private final double kP = 0.1;
+    private final double kP = 0.2;
     private final double kI = 0.0005;
     private final double kD = 0.01;
 
