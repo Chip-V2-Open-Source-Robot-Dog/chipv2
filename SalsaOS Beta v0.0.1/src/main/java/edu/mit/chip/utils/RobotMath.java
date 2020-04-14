@@ -10,6 +10,11 @@ public class RobotMath {
         double l2 = legModel.L6; //Math.sqrt(L4*L4+L6*L6);
 
         double rSquared = xD*xD+yD*yD;
+
+        //setup limits for rsquared and z
+        rSquared = clip(rSquared, (l1-l2)*(l1-l2), (l1+l2)*(l1+l2));
+        zD = clip(zD, -0.1, 0.1);
+
         double phi = Math.atan2(yD, xD);
         double kneeTheta = Math.acos((rSquared-l1*l1-l2*l2)/(-2.0*l1*l2));
         double alpha = Math.acos((l2*l2-l1*l1-rSquared)/(-2.0*l1*Math.sqrt(rSquared)));
