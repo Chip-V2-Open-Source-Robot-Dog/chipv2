@@ -91,7 +91,25 @@ public class Robot extends TimedRobot {
 
         System.out.println("Controllers constructed.");
 
-        //LOAD THE PID CONSTANTS
+        //CREATE PID CONSTANTS OBJECT
+        shoulder_hingePID = new PIDConstants(kP_S, kI_S, kD_S, kIz, kFF, kMaxOutput_S, kMinOutput_S, maxRPM);
+        kneePID = new PIDConstants(kP_K, kI_K, kD_K, kIz, kFF, kMaxOutput_K, kMinOutput_K, maxRPM);
+        //actually set the PID constants
+        shoulder_hingePID.load(fl_shoulder.getPIDController());
+        shoulder_hingePID.load(fl_hinge.getPIDController());
+        kneePID.load(fl_knee.getPIDController());
+
+        shoulder_hingePID.load(fr_shoulder.getPIDController());
+        shoulder_hingePID.load(fr_hinge.getPIDController());
+        kneePID.load(fr_knee.getPIDController());
+
+        shoulder_hingePID.load(bl_shoulder.getPIDController());
+        shoulder_hingePID.load(bl_hinge.getPIDController());
+        kneePID.load(bl_knee.getPIDController());
+
+        shoulder_hingePID.load(br_shoulder.getPIDController());
+        shoulder_hingePID.load(br_hinge.getPIDController());
+        kneePID.load(br_knee.getPIDController());
 
         System.out.println("Robot initialized.");
 
