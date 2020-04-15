@@ -138,9 +138,37 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         //PERIODICALLY PUBLISH VALUES
+        //FRONT LEFT LEG
         networking.pushReadout("fl_s", fl_shoulder.getEncoder().getPosition());
         networking.pushReadout("fl_h", fl_hinge.getEncoder().getPosition());
         networking.pushReadout("fl_k", fl_knee.getEncoder().getPosition());
+        networking.pushReadout("fl_s_current", fl_shoulder.getOutputCurrent());
+        networking.pushReadout("fl_h_current", fl_hinge.getOutputCurrent());
+        networking.pushReadout("fl_k_current", fl_knee.getOutputCurrent());
+        
+        //FRONT RIGHT LEG
+        networking.pushReadout("fr_s", fr_shoulder.getEncoder().getPosition());
+        networking.pushReadout("fr_h", fr_hinge.getEncoder().getPosition());
+        networking.pushReadout("fr_k", fr_knee.getEncoder().getPosition());
+        networking.pushReadout("fr_s_current", fr_shoulder.getOutputCurrent());
+        networking.pushReadout("fr_h_current", fr_hinge.getOutputCurrent());
+        networking.pushReadout("fr_k_current", fr_knee.getOutputCurrent());
+
+        //BACK LEFT LEG
+        networking.pushReadout("bl_s", bl_shoulder.getEncoder().getPosition());
+        networking.pushReadout("bl_h", bl_hinge.getEncoder().getPosition());
+        networking.pushReadout("bl_k", bl_knee.getEncoder().getPosition());
+        networking.pushReadout("bl_s_current", bl_shoulder.getOutputCurrent());
+        networking.pushReadout("bl_h_current", bl_hinge.getOutputCurrent());
+        networking.pushReadout("bl_k_current", bl_knee.getOutputCurrent());
+
+        //BACK RIGHT LEG
+        networking.pushReadout("br_s", br_shoulder.getEncoder().getPosition());
+        networking.pushReadout("br_h", br_hinge.getEncoder().getPosition());
+        networking.pushReadout("br_k", br_knee.getEncoder().getPosition());
+        networking.pushReadout("br_s_current", br_shoulder.getOutputCurrent());
+        networking.pushReadout("br_h_current", br_hinge.getOutputCurrent());
+        networking.pushReadout("br_k_current", br_knee.getOutputCurrent());
     }
     
     /**
@@ -148,15 +176,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        //INSERT CODE
-        setpointManager = new SetpointManager(this, new SpeedSet(0.7, 0.7, 0.7, 0.7));
-        for (LegType legType : legTypes) {
-            networking.initInput(legType.key("x"), defaultFootPosition.x);
-            networking.initInput(legType.key("y"), defaultFootPosition.y);
-            networking.initInput(legType.key("z"), defaultFootPosition.z);
-        }
-        pullSetpoint();
-        setpointManager.resume();
+        //SET ALL THE LEGS TO ZERO POSITION 
     }
     
     /**
