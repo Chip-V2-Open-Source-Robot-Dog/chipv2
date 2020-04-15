@@ -7,22 +7,11 @@
 
 package edu.mit.chip;
 
-import edu.mit.chip.mechanisms.Leg;
-import edu.mit.chip.setupactions.SetupActionChooser;
-import edu.mit.chip.setupactions.ZeroLegAction;
-import edu.mit.chip.setpoint.SetpointManager;
-import edu.mit.chip.leg.FootPosition;
-import edu.mit.chip.leg.LegModel;
-import edu.mit.chip.leg.LegType;
 import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
-import edu.mit.chip.utils.SpeedSet;
 import edu.mit.chip.utils.DS;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.Joystick;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -31,35 +20,34 @@ import edu.wpi.first.wpilibj.Joystick;
  * project.
  */
 public class Robot extends TimedRobot {
-    public Leg frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg;
-
-    private SetupActionChooser setupActionChooser;
-
-    private final double kP = 0.2;
-    private final double kI = 0.0005;
-    private final double kD = 0.01;
-
+    /*
+    FIRST LETS CREATE ALL THE KPS AND ETC
+    */
+    //COMMON
     private final double kIz = 0;
     private final double kFF = 0;
-
-    private final double kMaxOutput = 1.0;
-    private final double kMinOutput = -1.0;
     private final double maxRPM = 5700;
-
-    // private TrajectoryRunner trajectoryRunner;
-
-    protected final Leg[] legs = {frontLeftLeg, frontRightLeg, backLeftLeg, backRightLeg};
-    protected final LegType[] legTypes = {LegType.FRONT_LEFT, LegType.FRONT_RIGHT, LegType.BACK_LEFT, LegType.BACK_RIGHT};
-
-    protected final FootPosition defaultFootPosition = new FootPosition(0, 0.15, 0);
-    protected SetpointManager setpointManager;
-
-    Joystick joy = new Joystick(0);
+    //SHOULDER AND HINGE CONSTANTS
+    private final double kP_S = 0.2;
+    private final double kI_S = 0.0005;
+    private final double kD_S = 0.01;
+    private final double kMaxOutput_S = 1.0;
+    private final double kMinOutput_S = -1.0;
+    //KNEE CONSTANTS
+    private final double kP_K = 0.2;
+    private final double kI_K = 0.0005;
+    private final double kD_K = 0.01;
+    private final double kMaxOutput_K = 1.0;
+    private final double kMinOutput_K = -1.0;
 
     private Networking networking;
     // private Thread networkingThread;
 
     private DS DS = new DS();
+
+    //Create SPARKMAX Objects
+    public CANSparkMax fl_shoulder, fl_hinge, fl_knee, fr_shoulder, fr_hinge, fr_knee, bl_shoulder, bl_hinge, bl_knee, br_shoulder, br_hinge, br_knee;
+    public CANSparkMax[] controllers = [fl_shoulder, fl_hinge, fl_knee, fr_shoulder, fr_hinge, fr_knee, bl_shoulder, bl_hinge, bl_knee, br_shoulder, br_hinge, br_knee];
 
     /**
      * This function is run when the robot code is first started up (or restarted).
@@ -67,8 +55,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         System.out.println("Initializing robot...");
-        System.out.println("Attempting to construct legs.");
+        System.out.println("Attempting to construct CAN SparkMAXs.");
 
+        /*
         LegModel leftLegs = new LegModel(0.055, 0.075, 0.235, 0.1, 0.03, 0.32);
         LegModel rightLegs = new LegModel(0.055, -0.075, 0.235, 0.1, -0.03, 0.32);
 
@@ -76,45 +65,39 @@ public class Robot extends TimedRobot {
         frontRightLeg = new Leg(rightLegs, 12, false, 10, true, 11, true);
         backLeftLeg = new Leg(leftLegs, 4, true, 6, false, 5, false);
         backRightLeg = new Leg(rightLegs, 9, false, 7, true, 8, true);
+        */
 
-        System.out.println("Legs constructed.");
+        //CREATE SPARKMAXS AND DEAL WITH REVERSALS
+        //FRONT LEFT LEG
+        fl_shoulder =  new CANSparkMax(3, MotorType.kBrushless);
+        fl_hinge =     new CANSparkMax(2, MotorType.kBrushless);
+        fl_knee =      new CANSparkMax(1, MotorType.kBrushless);
+        fl_shoulder.isInverted(true);
+        //FRONT RIGHT LEG
+        fr_shoulder =  new CANSparkMax(12, MotorType.kBrushless);
+        fr_hinge =     new CANSparkMax(10, MotorType.kBrushless);
+        fr_knee =      new CANSparkMax(11, MotorType.kBrushless);
+        fr_hinge.isInverted(true);
+        fr_knee.isInverted(true);
+        //BACK LEFT LEG
+        bl_shoulder =  new CANSparkMax(4, MotorType.kBrushless);
+        bl_hinge =     new CANSparkMax(6, MotorType.kBrushless);
+        bl_knee =      new CANSparkMax(5, MotorType.kBrushless);
+        bl_shoulder.isInverted(true);
+        //BACK RIGHT LEG
+        br_shoulder =  new CANSparkMax(9, MotorType.kBrushless);
+        br_hinge =     new CANSparkMax(7, MotorType.kBrushless);
+        br_knee =      new CANSparkMax(8, MotorType.kBrushless);
+        br_hinge.isInverted(true);
+        br_knee.isInverted(true);
 
-        frontLeftLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
-        );
+        System.out.println("Controllers constructed.");
 
-        frontRightLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
-        );
-
-        backLeftLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
-        );
-
-        backRightLeg.loadPID(
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM),
-            new PIDConstants(kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM)
-        );
+        //LOAD THE PID CONSTANTS
 
         System.out.println("Robot initialized.");
 
-        setupActionChooser = new SetupActionChooser(
-            new ZeroLegAction(frontLeftLeg, "Front Left"),
-            new ZeroLegAction(frontRightLeg, "Front Right"),
-            new ZeroLegAction(backLeftLeg, "Back Left"),
-            new ZeroLegAction(backRightLeg, "Back Right")
-        );
-        setupActionChooser.putOnDashboard();
-
-        // trajectoryRunner = new TrajectoryRunner(this, new SpeedSet(0.5, 0.5, 0.5, 0.5));
-
+        //DO NETWORKING SETUP
         networking = Networking.getInstance();
         for (LegType legType : legTypes) {
             networking.addReadouts(
@@ -126,6 +109,7 @@ public class Robot extends TimedRobot {
                 legType.key("x"), legType.key("y"), legType.key("z")
             );
         }
+
         //ENABLE THE ROBOT WITH DS
         DS.start();
     }
