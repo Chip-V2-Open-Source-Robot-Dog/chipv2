@@ -46,9 +46,7 @@ public class Robot extends TimedRobot {
     private DS DS = new DS();
 
     //Create SPARKMAX Objects
-    public CANSparkMax fl_shoulder, fl_hinge, fl_knee, fr_shoulder, fr_hinge, fr_knee, bl_shoulder, bl_hinge, bl_knee, br_shoulder, br_hinge, br_knee;
-    public CANSparkMax[] controllers = [fl_shoulder, fl_hinge, fl_knee, fr_shoulder, fr_hinge, fr_knee, bl_shoulder, bl_hinge, bl_knee, br_shoulder, br_hinge, br_knee];
-
+    private CANSparkMax fl_shoulder, fl_hinge, fl_knee, fr_shoulder, fr_hinge, fr_knee, bl_shoulder, bl_hinge, bl_knee, br_shoulder, br_hinge, br_knee;
     /**
      * This function is run when the robot code is first started up (or restarted).
      */
