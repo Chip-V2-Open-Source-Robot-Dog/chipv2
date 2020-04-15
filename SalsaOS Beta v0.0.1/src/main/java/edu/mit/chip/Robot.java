@@ -138,7 +138,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         //PERIODICALLY PUBLISH VALUES
-        networking.pushReadout("fl_s", );
+        networking.pushReadout("fl_s", fl_shoulder.getEncoder().getPosition());
+        networking.pushReadout("fl_h", fl_hinge.getEncoder().getPosition());
+        networking.pushReadout("fl_k", fl_knee.getEncoder().getPosition());
     }
     
     /**
