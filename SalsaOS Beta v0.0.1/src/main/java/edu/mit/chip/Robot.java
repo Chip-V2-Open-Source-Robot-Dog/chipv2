@@ -115,16 +115,18 @@ public class Robot extends TimedRobot {
 
         //DO NETWORKING SETUP
         networking = Networking.getInstance();
-        for (LegType legType : legTypes) {
-            networking.addReadouts(
-                legType.key("x"), legType.key("y"), legType.key("z"),
-                legType.key("shoulderTheta"), legType.key("hingeTheta"), legType.key("kneeTheta"),
-                legType.key("current")
-            );
-            networking.addInputs(
-                legType.key("x"), legType.key("y"), legType.key("z")
-            );
-        }
+        networking.addReadouts(
+            "fl_s", "fl_h", "fl_k", "fl_s_current", "fl_h_current", "fl_k_current",
+            "fr_s", "fr_h", "fr_k", "fr_s_current", "fr_h_current", "fr_k_current",
+            "bl_s", "bl_h", "bl_k", "bl_s_current", "bl_h_current", "bl_k_current", 
+            "br_s", "br_h", "br_k", "br_s_current", "br_h_current", "br_k_current"
+        );
+        networking.addInputs(
+            "fl_s", "fl_h", "fl_k",
+            "fr_s", "fr_h", "fr_k",
+            "bl_s", "bl_h", "bl_k",
+            "br_s", "br_h", "br_k"
+        );
 
         //ENABLE THE ROBOT WITH DS
         DS.start();
@@ -135,12 +137,8 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void robotPeriodic() {
-        for (LegType legType : legTypes) {
-            Leg leg = getLeg(legType);
-
-            leg.updateDashboard(legType.name);
-            leg.pushData(networking, legType.prefix);
-        }
+        //PERIODICALLY PUBLISH VALUES
+        networking.pushReadout("fl_s", );
     }
     
     /**
@@ -148,7 +146,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopInit() {
-        // trajectoryRunner.reset();
+        //INSERT CODE
         setpointManager = new SetpointManager(this, new SpeedSet(0.7, 0.7, 0.7, 0.7));
         for (LegType legType : legTypes) {
             networking.initInput(legType.key("x"), defaultFootPosition.x);
@@ -176,7 +174,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void autonomousInit() {
-        CommandScheduler.getInstance().schedule(setupActionChooser.getChosenActionCmd());
+        //DO NOTHING
     }
     
     /**
@@ -185,7 +183,7 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void autonomousPeriodic() {
-        CommandScheduler.getInstance().run();
+        //DO NOTHING
     }
 
     /**
@@ -193,36 +191,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void disabledInit() {
-        CommandScheduler.getInstance().cancelAll();
-
-        frontLeftLeg.neutral();
-        frontRightLeg.neutral();
-        backLeftLeg.neutral();
-        backRightLeg.neutral();
-    }
-
-    public Leg getLeg(LegType type) {
-        if (type == LegType.FRONT_LEFT) {
-            return frontLeftLeg;
-        }
-        else if (type == LegType.FRONT_RIGHT) {
-            return frontRightLeg;
-        }
-        else if (type == LegType.BACK_LEFT) {
-            return backLeftLeg;
-        }
-        else {
-            return backRightLeg;
-        }
-    }
-
-    public void pullSetpoint() {
-        for (LegType legType : legTypes) {
-            this.setpointManager.updateSetpoint(legType,
-                networking.pullInput(legType.prefix + "_x", this.defaultFootPosition.x),
-                networking.pullInput(legType.prefix + "_y", this.defaultFootPosition.y),
-                networking.pullInput(legType.prefix + "_z", this.defaultFootPosition.z)
-            );
-        }
+        //SET ALL THE MOTORS TO NEUTRAL/VOLTAGE CONTROL and 0 VOLTS
     }
 }
