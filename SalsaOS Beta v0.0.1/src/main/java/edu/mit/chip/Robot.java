@@ -132,7 +132,8 @@ public class Robot extends TimedRobot {
             "fl_s", "fl_h", "fl_k", "fl_s_current", "fl_h_current", "fl_k_current",
             "fr_s", "fr_h", "fr_k", "fr_s_current", "fr_h_current", "fr_k_current",
             "bl_s", "bl_h", "bl_k", "bl_s_current", "bl_h_current", "bl_k_current", 
-            "br_s", "br_h", "br_k", "br_s_current", "br_h_current", "br_k_current"
+            "br_s", "br_h", "br_k", "br_s_current", "br_h_current", "br_k_current",
+            "VBUS"
         );
         networking.addInputs(
             "fl_s", "fl_h", "fl_k",
@@ -182,6 +183,13 @@ public class Robot extends TimedRobot {
         networking.pushReadout("br_s_current", br_shoulder.getOutputCurrent());
         networking.pushReadout("br_h_current", br_hinge.getOutputCurrent());
         networking.pushReadout("br_k_current", br_knee.getOutputCurrent());
+
+        //CALCULATE AVERAGE BUS VOLTAGE
+        double AVG_VOLTAGE = (fl_shoulder.getBusVoltage()+fr_shoulder.getBusVoltage()+bl_shoulder.getBusVoltage()+br_shoulder.getBusVoltage()+
+                            fl_hinge.getBusVoltage()+fr_hinge.getBusVoltage()+bl_hinge.getBusVoltage()+br_hinge.getBusVoltage()+
+                            fl_knee.getBusVoltage()+fr_knee.getBusVoltage()+bl_knee.getBusVoltage()+br_knee.getBusVoltage())/12.0;
+        //PUSH AVERAGE BUS VOLTAGE
+        networking.pushReadout("VBUS", AVG_VOLTAGE);
     }
     
     /**
