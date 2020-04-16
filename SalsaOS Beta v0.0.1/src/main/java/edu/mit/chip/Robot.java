@@ -20,6 +20,19 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * project.
  */
 public class Robot extends TimedRobot {
+    //GET CONTROL TYPE ENUM
+    public enum MotorControlType {
+        VOLTAGE(ControlType.kVoltage),
+        VELOCITY(ControlType.kVelocity),
+        POSITION(ControlType.kPosition);
+
+        public ControlType sparkMaxType;
+
+        private MotorControlType(ControlType sparkMaxType) {
+            this.sparkMaxType = sparkMaxType;
+        }
+    }
+
     /*
     FIRST LETS CREATE ALL THE KPS AND ETC
     */
@@ -177,6 +190,21 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         //SET ALL THE LEGS TO ZERO POSITION 
+        fl_shoulder.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        fl_hinge.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        fl_knee.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+
+        fr_shoulder.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        fr_hinge.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        fr_knee.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+
+        bl_shoulder.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        bl_hinge.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        bl_knee.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+
+        br_shoulder.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        br_hinge.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
+        br_knee.getPIDController().setReference(0.0, MotorControlType.POSITION.sparkMaxType);
     }
     
     /**
@@ -184,10 +212,22 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        // trajectoryRunner.tick();
+        //SET THE VALUES TO WHAT IS PULLED FROM NETWORK TABLES 
+        fl_shoulder.getPIDController().setReference(networking.pullInput("fl_s", 0.0), MotorControlType.POSITION.sparkMaxType);
+        fl_hinge.getPIDController().setReference(networking.pullInput("fl_h", 0.0), MotorControlType.POSITION.sparkMaxType);
+        fl_knee.getPIDController().setReference(networking.pullInput("fl_k", 0.0), MotorControlType.POSITION.sparkMaxType);
 
-        pullSetpoint();
-        setpointManager.tick();
+        fr_shoulder.getPIDController().setReference(networking.pullInput("fr_s", 0.0), MotorControlType.POSITION.sparkMaxType);
+        fr_hinge.getPIDController().setReference(networking.pullInput("fr_h", 0.0), MotorControlType.POSITION.sparkMaxType);
+        fr_knee.getPIDController().setReference(networking.pullInput("fr_k", 0.0), MotorControlType.POSITION.sparkMaxType);
+
+        bl_shoulder.getPIDController().setReference(networking.pullInput("bl_s", 0.0), MotorControlType.POSITION.sparkMaxType);
+        bl_hinge.getPIDController().setReference(networking.pullInput("bl_h", 0.0), MotorControlType.POSITION.sparkMaxType);
+        bl_knee.getPIDController().setReference(networking.pullInput("bl_k", 0.0), MotorControlType.POSITION.sparkMaxType);
+
+        br_shoulder.getPIDController().setReference(networking.pullInput("br_s", 0.0), MotorControlType.POSITION.sparkMaxType);
+        br_hinge.getPIDController().setReference(networking.pullInput("br_h", 0.0), MotorControlType.POSITION.sparkMaxType);
+        br_knee.getPIDController().setReference(networking.pullInput("br_k", 0.0), MotorControlType.POSITION.sparkMaxType);
     }
     
     /**
@@ -214,5 +254,20 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledInit() {
         //SET ALL THE MOTORS TO NEUTRAL/VOLTAGE CONTROL and 0 VOLTS
+        fl_shoulder.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        fl_hinge.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        fl_knee.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+
+        fr_shoulder.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        fr_hinge.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        fr_knee.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+
+        bl_shoulder.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        bl_hinge.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        bl_knee.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+
+        br_shoulder.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        br_hinge.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
+        br_knee.getPIDController().setReference(0.0, MotorControlType.VOLTAGE.sparkMaxType);
     }
 }
