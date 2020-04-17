@@ -48,20 +48,20 @@ public class Robot extends TimedRobot {
     private final double kP_S = 0.35;
     private final double kI_S = 0.0001;
     private final double kD_S = 0.01;
-    private final double kMaxOutput_S = 0.23;
-    private final double kMinOutput_S = -0.23;
+    private final double kMaxOutput_S = 0.14;
+    private final double kMinOutput_S = -0.14;
     //HINGE CONSTANTS
     private final double kP_H = 0.35;
     private final double kI_H = 0.0001;
     private final double kD_H = 0.01;
-    private final double kMaxOutput_H = 0.23;
-    private final double kMinOutput_H = -0.23;
+    private final double kMaxOutput_H = 0.14;
+    private final double kMinOutput_H = -0.14;
     //KNEE CONSTANTS
     private final double kP_K = 0.3;
     private final double kI_K = 0.0001;
     private final double kD_K = 0.01;
-    private final double kMaxOutput_K = 0.23;
-    private final double kMinOutput_K = -0.23;
+    private final double kMaxOutput_K = 0.14;
+    private final double kMinOutput_K = -0.14;
 
     private Networking networking;
     // private Thread networkingThread;
