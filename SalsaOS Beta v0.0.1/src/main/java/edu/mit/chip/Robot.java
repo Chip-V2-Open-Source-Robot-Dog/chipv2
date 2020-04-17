@@ -41,15 +41,15 @@ public class Robot extends TimedRobot {
     private final double kFF = 0;
     private final double maxRPM = 5700;
     //SHOULDER AND HINGE CONSTANTS
-    private final double kP_S = 0.2;
-    private final double kI_S = 0.0005;
-    private final double kD_S = 0.01;
+    private final double kP_S = 0.05;
+    private final double kI_S = 0.0;
+    private final double kD_S = 0.0;
     private final double kMaxOutput_S = 1.0;
     private final double kMinOutput_S = -1.0;
     //KNEE CONSTANTS
-    private final double kP_K = 0.2;
-    private final double kI_K = 0.0005;
-    private final double kD_K = 0.01;
+    private final double kP_K = 0.05;
+    private final double kI_K = 0.0;
+    private final double kD_K = 0.0;
     private final double kMaxOutput_K = 1.0;
     private final double kMinOutput_K = -1.0;
 
