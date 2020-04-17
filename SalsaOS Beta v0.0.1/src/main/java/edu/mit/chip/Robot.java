@@ -109,8 +109,8 @@ public class Robot extends TimedRobot {
         System.out.println("Controllers constructed.");
 
         //CREATE PID CONSTANTS OBJECT
-        shoulder_hingePID = new PIDConstants(kP_S, kI_S, kD_S, kIz, kFF, kMaxOutput_S, kMinOutput_S, maxRPM);
-        kneePID = new PIDConstants(kP_K, kI_K, kD_K, kIz, kFF, kMaxOutput_K, kMinOutput_K, maxRPM);
+        PIDConstants shoulder_hingePID = new PIDConstants(kP_S, kI_S, kD_S, kIz, kFF, kMaxOutput_S, kMinOutput_S, maxRPM);
+        PIDConstants kneePID = new PIDConstants(kP_K, kI_K, kD_K, kIz, kFF, kMaxOutput_K, kMinOutput_K, maxRPM);
         //actually set the PID constants
         shoulder_hingePID.load(fl_shoulder.getPIDController());
         shoulder_hingePID.load(fl_hinge.getPIDController());
