@@ -1,0 +1,111 @@
+#!/usr/bin/env python
+
+'''
+This node is both a publisher and a subscriber that will eventually 
+read information from the ROS system and send it to the RIO as 
+well as read information from the RIO and send it to the jetson. 
+
+PUBLISHED TOPICS:
+POS = Float64[] ARRAY OF RAW ENCODER POSITIONS S, H, K FOR EACH LEG
+CURRENTS = Float64[] ARRAY OF OUTPUT CURRENTS FOR EACH LEG S, H, K
+VBUS = Float64 AVERAGE BUS VOLTAGE OF THE SYSTEM
+'''
+
+import rospy
+from std_msgs.msg import Float64, Float64MultiArray
+from networktables import NetworkTables as nt
+from DEFAULTS import DEFAULTS
+
+'''
+SOME INITIALIZATION CODE
+'''
+#start network tables server
+nt.initialize(server=DEFAULTS.RIO_IP)
+#initialize tables
+readout=nt.getTable("rio_readout")
+
+'''
+DEFINE SOME CLASS VARIABLES
+'''
+POS_IN = []
+CURRENTS_IN = []
+VBUS = 0.0
+
+'''
+DEFINING SOME CONSTANTS
+'''
+DEFAULT_VAL = DEFAULTS.NT_DEFAULT_VAL
+PUB_RATE = 60 #60hz
+
+#____________________________________________________________________________________________________________________________________________________________________
+# THESE METHODS ARE NON-ROS ROBORIO SPECIFIC FUNCTIIONS FOR COMMUNICATIONS
+#____________________________________________________________________________________________________________________________________________________________________
+
+'''
+This method gets the information from the RIO and organizes it in the arrays/nested arrays
+'''
+def read_rio():
+    #GET GLOBAL VARS
+    global VBUS
+    global POS_IN
+    global CURRENTS_IN
+
+    '''
+    FOOT POSITIONS GETTING
+    '''
+    #get the readouts from the RIO
+    #FL_P = [readout.getNumber("fL_x", DEFAULT_VAL), readout.getNumber("fL_y", DEFAULT_VAL), readout.getNumber("fL_z", DEFAULT_VAL)]
+    #FR_P = [readout.getNumber("fR_x", DEFAULT_VAL), readout.getNumber("fR_y", DEFAULT_VAL), readout.getNumber("fR_z", DEFAULT_VAL)]
+    #BL_P = [readout.getNumber("bL_x", DEFAULT_VAL), readout.getNumber("bL_y", DEFAULT_VAL), readout.getNumber("bL_z", DEFAULT_VAL)]
+    #BR_P = [readout.getNumber("bR_x", DEFAULT_VAL), readout.getNumber("bR_y", DEFAULT_VAL), readout.getNumber("bR_z", DEFAULT_VAL)]
+    #put them in order of LEG, FL, FR, BL, BR
+    POS_IN = [readout.getNumber("fl_s", DEFAULT_VAL), readout.getNumber("fl_h", DEFAULT_VAL), readout.getNumber("fl_k", DEFAULT_VAL), readout.getNumber("fr_s", DEFAULT_VAL), readout.getNumber("fr_h", DEFAULT_VAL), readout.getNumber("fr_k", DEFAULT_VAL), readout.getNumber("bl_s", DEFAULT_VAL), readout.getNumber("bl_h", DEFAULT_VAL), readout.getNumber("bl_k", DEFAULT_VAL), readout.getNumber("br_s", DEFAULT_VAL), readout.getNumber("br_h", DEFAULT_VAL), readout.getNumber("br_k", DEFAULT_VAL)]
+
+    '''
+    GETTING CURRENTS
+    '''
+    #just get and add because it's total currents
+    CURRENTS_IN = [readout.getNumber("fl_s_current", DEFAULT_VAL), readout.getNumber("fl_h_current", DEFAULT_VAL), readout.getNumber("fl_k_current", DEFAULT_VAL), readout.getNumber("fr_s_current", DEFAULT_VAL), readout.getNumber("fr_h_current", DEFAULT_VAL), readout.getNumber("fr_k_current", DEFAULT_VAL), readout.getNumber("bl_s_current", DEFAULT_VAL), readout.getNumber("bl_h_current", DEFAULT_VAL), readout.getNumber("bl_k_current", DEFAULT_VAL), readout.getNumber("br_s_current", DEFAULT_VAL), readout.getNumber("br_h_current", DEFAULT_VAL), readout.getNumber("br_k_current", DEFAULT_VAL)]
+
+    '''
+    GETTING VBUS
+    '''
+    VBUS = readout.getNumber("VBUS", DEFAULT_VAL)
+
+#____________________________________________________________________________________________________________________________________________________________________
+# HERE'S THE ACTUAL ROS NODE METHODS AND ETC.
+#____________________________________________________________________________________________________________________________________________________________________
+
+'''
+This is a ROS SPECIFIC node that publishes the data at a certain rate
+'''
+def publisher():
+    #CREATE THE PUBLISHERS
+    POS_PUBLISHER = rospy.Publisher('POS', Float64MultiArray, queue_size=0) #default queue size is 0
+    CURRENTS_PUBLISHER = rospy.Publisher('CURRENTS', Float64MultiArray, queue_size=0) #default queue size is 0
+    VOLTAGE_PUBLISHER = rospy.Publisher('VBUS', Float64, queue_size=0) #default queue size is 0
+
+    #initilize the node
+    rospy.init_node("RIO_READER")
+    #set the publishing and reading rate
+    rate = rospy.Rate(PUB_RATE) #in Hz
+
+    while not rospy.is_shutdown():
+        #NOW WE READ DATA FROM THE RIO
+        read_rio()
+        #WRITE DATA NOW THAT read_rio has modified it
+        POS_PUBLISHER.publish(Float64MultiArray(data=POS_IN))
+        CURRENTS_PUBLISHER.publish(Float64MultiArray(data=CURRENTS_IN))
+        VOLTAGE_PUBLISHER.publish(Float64(data=VBUS))
+        #sleep for the pub rate
+        rate.sleep()
+
+'''
+not specific to ROS, this is the MAIN method, run this
+'''
+if __name__ == '__main__':
+    try:
+        publisher()
+    except rospy.ROSInterruptException:
+        pass
+
