@@ -7,6 +7,10 @@
 
 package edu.mit.chip;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.mit.chip.utils.Networking;
 import edu.mit.chip.utils.PIDConstants;
 import edu.mit.chip.utils.DS;
