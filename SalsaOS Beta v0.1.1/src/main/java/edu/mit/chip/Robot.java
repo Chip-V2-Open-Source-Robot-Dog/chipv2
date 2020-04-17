@@ -57,8 +57,8 @@ public class Robot extends TimedRobot {
     private final double kMaxOutput_H = 0.23;
     private final double kMinOutput_H = -0.23;
     //KNEE CONSTANTS
-    private final double kP_K = 0.25;
-    private final double kI_K = 0.0005;
+    private final double kP_K = 0.3;
+    private final double kI_K = 0.0001;
     private final double kD_K = 0.01;
     private final double kMaxOutput_K = 0.23;
     private final double kMinOutput_K = -0.23;
