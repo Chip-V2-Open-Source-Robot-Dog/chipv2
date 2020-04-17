@@ -44,12 +44,18 @@ public class Robot extends TimedRobot {
     private final double kIz = 0;
     private final double kFF = 0;
     private final double maxRPM = 5700;
-    //SHOULDER AND HINGE CONSTANTS
+    //SHOULDER CONSTANTS
     private final double kP_S = 0.05;
     private final double kI_S = 0.0;
     private final double kD_S = 0.0;
     private final double kMaxOutput_S = 1.0;
     private final double kMinOutput_S = -1.0;
+    //HINGE CONSTANTS
+    private final double kP_H = 0.05;
+    private final double kI_H = 0.0;
+    private final double kD_H = 0.0;
+    private final double kMaxOutput_H = 1.0;
+    private final double kMinOutput_H = -1.0;
     //KNEE CONSTANTS
     private final double kP_K = 0.05;
     private final double kI_K = 0.0;
@@ -87,45 +93,46 @@ public class Robot extends TimedRobot {
         fl_shoulder =  new CANSparkMax(3, MotorType.kBrushless);
         fl_hinge =     new CANSparkMax(2, MotorType.kBrushless);
         fl_knee =      new CANSparkMax(1, MotorType.kBrushless);
-        fl_shoulder.isInverted(true);
+        fl_shoulder.setInverted(true);
         //FRONT RIGHT LEG
         fr_shoulder =  new CANSparkMax(12, MotorType.kBrushless);
         fr_hinge =     new CANSparkMax(10, MotorType.kBrushless);
         fr_knee =      new CANSparkMax(11, MotorType.kBrushless);
-        fr_hinge.isInverted(true);
-        fr_knee.isInverted(true);
+        fr_hinge.setInverted(true);
+        fr_knee.setInverted(true);
         //BACK LEFT LEG
         bl_shoulder =  new CANSparkMax(4, MotorType.kBrushless);
         bl_hinge =     new CANSparkMax(6, MotorType.kBrushless);
         bl_knee =      new CANSparkMax(5, MotorType.kBrushless);
-        bl_shoulder.isInverted(true);
+        bl_shoulder.setInverted(true);
         //BACK RIGHT LEG
         br_shoulder =  new CANSparkMax(9, MotorType.kBrushless);
         br_hinge =     new CANSparkMax(7, MotorType.kBrushless);
         br_knee =      new CANSparkMax(8, MotorType.kBrushless);
-        br_hinge.isInverted(true);
-        br_knee.isInverted(true);
+        br_hinge.setInverted(true);
+        br_knee.setInverted(true);
 
         System.out.println("Controllers constructed.");
 
         //CREATE PID CONSTANTS OBJECT
-        PIDConstants shoulder_hingePID = new PIDConstants(kP_S, kI_S, kD_S, kIz, kFF, kMaxOutput_S, kMinOutput_S, maxRPM);
+        PIDConstants shoulderPID = new PIDConstants(kP_S, kI_S, kD_S, kIz, kFF, kMaxOutput_S, kMinOutput_S, maxRPM);
+        PIDConstants hingePID = new PIDConstants(kP_H, kI_H, kD_H, kIz, kFF, kMaxOutput_H, kMinOutput_H, maxRPM);
         PIDConstants kneePID = new PIDConstants(kP_K, kI_K, kD_K, kIz, kFF, kMaxOutput_K, kMinOutput_K, maxRPM);
         //actually set the PID constants
-        shoulder_hingePID.load(fl_shoulder.getPIDController());
-        shoulder_hingePID.load(fl_hinge.getPIDController());
+        shoulderPID.load(fl_shoulder.getPIDController());
+        hingePID.load(fl_hinge.getPIDController());
         kneePID.load(fl_knee.getPIDController());
 
-        shoulder_hingePID.load(fr_shoulder.getPIDController());
-        shoulder_hingePID.load(fr_hinge.getPIDController());
+        shoulderPID.load(fr_shoulder.getPIDController());
+        hingePID.load(fr_hinge.getPIDController());
         kneePID.load(fr_knee.getPIDController());
 
-        shoulder_hingePID.load(bl_shoulder.getPIDController());
-        shoulder_hingePID.load(bl_hinge.getPIDController());
+        shoulderPID.load(bl_shoulder.getPIDController());
+        hingePID.load(bl_hinge.getPIDController());
         kneePID.load(bl_knee.getPIDController());
 
-        shoulder_hingePID.load(br_shoulder.getPIDController());
-        shoulder_hingePID.load(br_hinge.getPIDController());
+        shoulderPID.load(br_shoulder.getPIDController());
+        hingePID.load(br_hinge.getPIDController());
         kneePID.load(br_knee.getPIDController());
 
         System.out.println("Robot initialized.");
