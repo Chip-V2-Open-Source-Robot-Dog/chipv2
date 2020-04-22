@@ -5,6 +5,11 @@
     <!-- launch the RIO comms nodes first -->
     <node respawn="true" pkg="CHIP_ROS" type="RIO_READ_NODE.py" name="DATA_READ"/>
     <node respawn="true" pkg="CHIP_ROS" type="RIO_WRITE_NODE.py" name="DATA_WRITE"/>
+    <!-- launch the kinematics nodes and other utilities -->
+    <!--node respawn="true" pkg="CHIP_ROS" type="FK.py" name="FK"/-->
+    <node respawn="true" pkg="CHIP_ROS" type="IK.py" name="IK"/>
+    <node respawn="true" pkg="CHIP_ROS" type="FK.py" name="FK"/>
+    <node respawn="true" pkg="CHIP_ROS" type="BALANCE.py" name="STABILIZER"/>
     <!-- finally, launch the master -->
     <node respawn="true" pkg="CHIP_ROS" type="MASTER.py" name="CHIP_MASTER"/>
     <!-- LET's LAUNCH THIRD PART NODES LAST -->

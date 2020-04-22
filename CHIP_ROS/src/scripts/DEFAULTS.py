@@ -28,18 +28,20 @@ class DEFAULTS():
 
     #IMU Defaults
     DESIRED_RPY = [0.0, 0.0, 0.0]
-    IMU_ON = False
+    IMU_ON = True
 
     #leg defaults
-    BIAS = 0.045
-    LOW = 0.47
+    BIAS = 0.145
+    LOW = 0.49
     HIGH = 0.49
     ZPOS_L = 0.0
     ZPOS = 0.0
-    HOME = [0.0+BIAS, 0.15, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L, 0.0+2*BIAS, 0.15, ZPOS_L]
-    STAND = [0.0+BIAS, LOW, ZPOS,  0.0+BIAS, LOW, ZPOS, 0.0+BIAS, HIGH, ZPOS, 0.0+2*BIAS, HIGH, ZPOS]
-    WALK_HOME = [0.0+BIAS, HIGH, ZPOS,  0.0+BIAS, HIGH, ZPOS, 0.0+BIAS, HIGH, ZPOS, 0.0+2*BIAS, HIGH, ZPOS]
+    HOME = [0.0+0.045/2, 0.2, ZPOS_L, 0.0+0.045/2, 0.2, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L]
+    STAND = [-0.045/2, LOW, ZPOS,  -0.045/2, LOW, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS]
+    WALK_HOME = [-0.045/2, HIGH, ZPOS,  -0.045/2, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS]
     SIT = HOME
+
+    TEST = [-0.045/2, LOW, ZPOS,  -0.045/2, LOW, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, 0.35, ZPOS]
 
     #walking defaults
     #possibly won't need these dudes either

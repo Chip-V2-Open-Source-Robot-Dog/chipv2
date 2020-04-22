@@ -33,17 +33,13 @@ MODE = CONTROL_MODE.STAND_SIT
 '''
 DEFIINE VARIABLES TO PUBLISH
 '''
-SET_TO_PUB = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0] #THIS IS THE DEFAULT "HOME" we should change this to the current foot pose
-ENABLE = False
+SET_TO_PUB = DEFAULTS.SIT #THIS IS THE DEFAULT "HOME" we should change this to the current foot pose
 
 '''
 creating publisher up here so on callback we can REPUBLISH
 '''
 #SET_PUB = rospy.Publisher('SETPOINT_UNSTABLE', Float64MultiArray, queue_size=0) #default queue size is 0
-if(DEFAULTS.IMU_ON):
-    SET_PUB = rospy.Publisher('CMDS_RAW', Float64MultiArray, queue_size=0) #default queue size is 0
-else:
-    SET_PUB = rospy.Publisher('CMDS', Float64MultiArray, queue_size=0)
+SET_PUB = rospy.Publisher('XYZ', Float64MultiArray, queue_size=0) #default queue size is 0
 #above quickly sets if we use IMU
 MODE_PUB = rospy.Publisher('CONTROL_MODE', Int16, queue_size=0)
 
@@ -52,7 +48,7 @@ MODE_PUB = rospy.Publisher('CONTROL_MODE', Int16, queue_size=0)
 #____________________________________________________________________________________________________________________________________________________________________
 
 """Bounds the value input between lower and upper, known limits of the system, think of them as virtual hardstops"""
-def bound(lower, upper, value):
+def clip(lower, upper, value):
     if (value>=upper):
         return upper
     if (value<=lower):
@@ -83,14 +79,27 @@ def joy_callback(data):
     X = data.buttons[3]
     Y = data.buttons[4]
 
-    SET_MAG = 5.0
-
-    if (LB == 1.0):
+    if(LB==1.0):
         global SET_TO_PUB
-        SET_TO_PUB[2] = SET_MAG
+        SET_TO_PUB=DEFAULTS.STAND
+    if(RB==1.0):
+        global SET_TO_PUB
+        SET_TO_PUB=DEFAULTS.SIT
+
+    if(A==1.0):
+        global SET_TO_PUB
+        SET_TO_PUB=DEFAULTS.TEST
+
+    if(X==1.0):
+        global MODE
+        MODE = CONTROL_MODE.WALK
+    if(Y==1.0):
+        global MODE
+        MODE = CONTROL_MODE.STAND_SIT
 
     #actually publish the setpoint
     SET_PUB.publish(Float64MultiArray(data=SET_TO_PUB))
+    MODE_PUB.publish(Int16(data=MODE))
 
 
 '''
