@@ -28,23 +28,21 @@ class DEFAULTS():
 
     #IMU Defaults
     DESIRED_RPY = [0.0, 0.0, 0.0]
-    IMU_ON = True
+    IMU_ON = False
 
     #leg defaults
-    BIAS = 0.145
-    LOW = 0.49
-    HIGH = 0.49
-    ZPOS_L = 0.0
-    ZPOS = 0.0
-    HOME = [0.0+0.045/2, 0.2, ZPOS_L, 0.0+0.045/2, 0.2, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L, 0.0+BIAS, 0.15, ZPOS_L]
-    STAND = [-0.045/2, LOW, ZPOS,  -0.045/2, LOW, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS]
-    WALK_HOME = [-0.045/2, HIGH, ZPOS,  -0.045/2, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS]
-    SIT = HOME
 
-    TEST = [-0.045/2, LOW, ZPOS,  -0.045/2, LOW, ZPOS, 0.0+BIAS-0.045, HIGH, ZPOS, 0.0+BIAS-0.045, 0.35, ZPOS]
+    #walking defaults//
 
-    #walking defaults
-    #possibly won't need these dudes either
-    MAX_GATE = -0.15
-    MAX_STRAFE = 0.05
-    MAX_SPIN = 0.05
+    #epsilons for == testing & Defaults to NOT CHANGE
+    EPSILON = 1.0
+    #joint limits
+    JOINT_LIMIT = 50.0
+    JL_L = 5.0
+    #zeroing and terrain offsets
+    TERRAIN_OFFSET = 0.0
+    ZERO_OFFSET = -8.0
+    #configurations to note
+    STARTING_CONFIG = [8, 0, 8, 8, 0, 8, 8, 0, 8, 8, 0, 8]
+    CMA_CENTER = [12.5, 0.0, 30.8, 12.5, 0.0, 30.8, 12.5, 0.0, 31.8, 12.5, 0.0, 31.8]
+    

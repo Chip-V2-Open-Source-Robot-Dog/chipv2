@@ -6,13 +6,14 @@
     <node respawn="true" pkg="CHIP_ROS" type="RIO_READ_NODE.py" name="DATA_READ"/>
     <node respawn="true" pkg="CHIP_ROS" type="RIO_WRITE_NODE.py" name="DATA_WRITE"/>
     <!-- launch the kinematics nodes and other utilities -->
-    <!--node respawn="true" pkg="CHIP_ROS" type="FK.py" name="FK"/-->
-    <node respawn="true" pkg="CHIP_ROS" type="IK.py" name="IK"/>
     <node respawn="true" pkg="CHIP_ROS" type="FK.py" name="FK"/>
-    <node respawn="true" pkg="CHIP_ROS" type="BALANCE.py" name="STABILIZER"/>
     <!-- finally, launch the master -->
-    <node respawn="true" pkg="CHIP_ROS" type="MASTER.py" name="CHIP_MASTER"/>
-    <!-- LET's LAUNCH THIRD PART NODES LAST -->
+    <node respawn="true" pkg="CHIP_ROS" type="CHIP.py" name="CHIP_MASTER"/>
+    <!-- let's launch some transform stuff-->
+    <node respawn="true" pkg="CHIP_ROS" type="tf.py" name="IMU_DATA_PUBLISHER"/>
+    <!-- LET's LAUNCH THIRD PARTY NODES LAST -->
     <node respawn="true" pkg="joy" type="joy_node" name="JOYSTICK_INPUT"/>
+    <include file="/opt/ros/melodic/share/rosbridge_server/launch/rosbridge_websocket.launch" />
     <include file="/opt/ros/melodic/share/mavros/launch/apm.launch" />
+    <include file="/opt/ros/melodic/share/realsense2_camera/launch/rs_t265.launch" />
 </launch>

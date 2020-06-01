@@ -13,8 +13,14 @@ VBUS = Float64 AVERAGE BUS VOLTAGE OF THE SYSTEM
 
 import rospy
 from std_msgs.msg import Float64, Float64MultiArray
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus
 from networktables import NetworkTables as nt
 from DEFAULTS import DEFAULTS
+
+'''some networkin stuff'''
+import socket    
+hostname = socket.gethostname()    
+IPAddr = socket.gethostbyname(hostname)
 
 '''
 SOME INITIALIZATION CODE
@@ -30,6 +36,9 @@ DEFINE SOME CLASS VARIABLES
 POS_IN = []
 CURRENTS_IN = []
 VBUS = 0.0
+arr = []
+connection = "Initializing"
+mtype = 2
 
 '''
 DEFINING SOME CONSTANTS
@@ -75,6 +84,29 @@ def read_rio():
 #____________________________________________________________________________________________________________________________________________________________________
 # HERE'S THE ACTUAL ROS NODE METHODS AND ETC.
 #____________________________________________________________________________________________________________________________________________________________________
+'''
+created the diagnostic message to publish
+'''
+def create_diag_msg():
+    global arr
+
+    '''determine data'''
+    if (VBUS==DEFAULTS.NT_DEFAULT_VAL):
+        global connection
+        global mtype
+        connection = "Not Connected to RIO... retrying. Looking for RIO at " + DEFAULTS.RIO_IP
+        mtype = 2
+    else:
+        global connection
+        global mtype
+        connection = "Connected to RIO at " + DEFAULTS.RIO_IP
+        mtype = 0
+
+    arr = DiagnosticArray()
+    arr.status = [
+        DiagnosticStatus(name='RoboRIO Actuation Controller', message=connection, level=mtype),
+        DiagnosticStatus(name='Jetson TX1 Connection IP', message=DEFAULTS.JETSON_IP)
+    ]
 
 '''
 This is a ROS SPECIFIC node that publishes the data at a certain rate
@@ -84,6 +116,7 @@ def publisher():
     POS_PUBLISHER = rospy.Publisher('POS', Float64MultiArray, queue_size=0) #default queue size is 0
     CURRENTS_PUBLISHER = rospy.Publisher('CURRENTS', Float64MultiArray, queue_size=0) #default queue size is 0
     VOLTAGE_PUBLISHER = rospy.Publisher('VBUS', Float64, queue_size=0) #default queue size is 0
+    DIAGNOSTICS = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
 
     #initilize the node
     rospy.init_node("RIO_READER")
@@ -93,10 +126,13 @@ def publisher():
     while not rospy.is_shutdown():
         #NOW WE READ DATA FROM THE RIO
         read_rio()
+        create_diag_msg()
         #WRITE DATA NOW THAT read_rio has modified it
         POS_PUBLISHER.publish(Float64MultiArray(data=POS_IN))
         CURRENTS_PUBLISHER.publish(Float64MultiArray(data=CURRENTS_IN))
         VOLTAGE_PUBLISHER.publish(Float64(data=VBUS))
+        DIAGNOSTICS.publish(arr)
+
         #sleep for the pub rate
         rate.sleep()
 

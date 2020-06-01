@@ -1,0 +1,8 @@
+prefix=/home/chip-core/chip_v2/devel
+
+Name: CHIP_ROS
+Description: Description of CHIP_ROS
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
 '''
-This node is both a publisher and a subscriber. It is basically a large
-PID controller that takes IMU input to make the platform stable. It does
-this in two ways, if the platform is falling in one direction or the other
-it will correct by moving in the opposite direction and if it senses the
-platform is not sitting level it will correct by positioning the legs as such
+This node is both a publisher and a subscriber. It basically takes
+IMU input and publishes the orientation and the IMU tf.
 '''
 
 import rospy
@@ -16,30 +13,32 @@ import numpy as np
 from simple_pid import PID
 from DEFAULTS import DEFAULTS
 from CONTROL_MODES import CONTROL_MODE
+#vizualization imports
+import tf2_ros
+import geometry_msgs.msg
+from geometry_msgs.msg import Quaternion, Pose, Point, Vector3
+from visualization_msgs.msg import Marker
+from std_msgs.msg import Header, ColorRGBA
 
 '''
 DEFINE SOME GLOBAL VARIABLES
 '''
 DESIRED = DEFAULTS.DESIRED_RPY #FOR NOW we're keeping all angles as 0, roll-pitch-yaw
-LIMIT = 10.0
-ROLL_PID = PID(Kp=25.0, Ki=0.0, Kd=0.0, setpoint=DESIRED[0], output_limits=(-LIMIT/2, LIMIT/2))
-PITCH_PID = PID(Kp=25.0, Ki=0.0, Kd=0.0, setpoint=DESIRED[1], output_limits=(-LIMIT, LIMIT))
 
 '''
 DEFIINE VARIABLES TO PUBLISH
 '''
-SET_TO_PUB = [] #NO DEFAULT PUB SET FOR THE IMU NODE
 ORI = [] #roll, pitch, yaw
-CURRENT_SETPOINT = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0] #default setpoint is the HOME position until otherwise noted  we should change to current foot pose
+QUART = []
 MODE = CONTROL_MODE.STAND_SIT
 
 '''
 creating publisher up here so on callback we can REPUBLISH
 '''
+br = tf2_ros.TransformBroadcaster()
+cube_publisher = rospy.Publisher('visualization_marker', Marker, queue_size=5)
+marker_publisher = rospy.Publisher('vtext_marker', Marker, queue_size=5)
 ORI_PUB = rospy.Publisher('ORIENTATION', Float64MultiArray, queue_size=0) #default queue size is 0
-if(DEFAULTS.IMU_ON):
-    SET_PUB = rospy.Publisher('CMDS', Float64MultiArray, queue_size=0) #default queue size is 0
-
 
 #____________________________________________________________________________________________________________________________________________________________________
 # THESE METHODS ARE HELPER METHODS
@@ -75,12 +74,6 @@ def bound(lower, upper, value):
 #____________________________________________________________________________________________________________________________________________________________________
 
 #we can update the DESIRED roll pitch and yaw easily like this later!
-def setpoint_callback(data):
-    global CURRENT_SETPOINT
-    #get the current setpoint and set it to that
-    CURRENT_SETPOINT = data.data
-
-#we can update the DESIRED roll pitch and yaw easily like this later!
 def mode_callback(data):
     global MODE
     #get the current setpoint and set it to that
@@ -91,6 +84,7 @@ gets the imu data, feeds it to the method and calaucaltes the euler angles, and 
 '''
 def callback(data):
     global ORI
+    global QUART
 
     #get the quaternion
     w = data.orientation.w
@@ -98,40 +92,47 @@ def callback(data):
     y = data.orientation.y
     z = data.orientation.z
 
+    #generate the text marker for the IMU data
+    marker = Marker(
+                type=Marker.TEXT_VIEW_FACING,
+                id=1,
+                lifetime=rospy.Duration(1.5),
+                pose=Pose(Point(0.15, 0.0, 0.0), Quaternion(0, 0, 0, 1)),
+                scale=Vector3(0.1, 0.1, 0.1),
+                header=Header(frame_id='imu_frame'),
+                color=ColorRGBA(255,255,255,1.0),
+                text = "BACK OF ROBOT")
+    marker_publisher.publish(marker)
+
+    #generate the visualization marker for the IMU data
+    cube = Marker(
+                type=Marker.CUBE,
+                id=0,
+                lifetime=rospy.Duration(1.5),
+                pose=Pose(Point(0.0, 0.0, -0.1), Quaternion(x, y, z, w)),
+                scale=Vector3(0.1, 0.1, 0.1),
+                header=Header(frame_id='base_link_frd'),
+                color=ColorRGBA(255,0,255,0.6))
+    cube_publisher.publish(cube)
+
+    #generate the TF visualization...
+    t = geometry_msgs.msg.TransformStamped()
+    #populate the geo_msg vector
+    t.header.stamp = rospy.Time.now()
+    t.header.frame_id = "base_link_frd"
+    t.child_frame_id = "imu_frame"
+    t.transform.translation.x = 0.0
+    t.transform.translation.y = 0.0
+    t.transform.translation.z = -0.1
+    t.transform.rotation.x = x
+    t.transform.rotation.y = y
+    t.transform.rotation.z = z
+    t.transform.rotation.w = w
+    #send the transform 
+    br.sendTransform(t)
+
     #get the roll/pitch/yaw angles
     ORI = quaternion_to_euler(w, x, y, z)
-
-    if(MODE == CONTROL_MODE.WALK):
-        #define the current set to publish
-        global SET_TO_PUB
-        SET_TO_PUB = list(CURRENT_SETPOINT) #make it a mutable list
-        #define the current roll and pitch
-        ROLL = ORI[0]
-        PITCH = ORI[1]
-
-        #execute the PID - ptch changes the shoulder and roll changes the hinge
-        ROLL_OUTPUT = ROLL_PID(ROLL)
-        PITCH_OUTPUT = PITCH_PID(PITCH)
-
-        #set the commands to the legs WE WILL CHANGE THIS TO ONLY THE LEGS
-        #THAT ARE ON THE GROUND AT A LATER POINT.
-        SET_TO_PUB[0] = PITCH_OUTPUT+CURRENT_SETPOINT[0]
-        SET_TO_PUB[1] = ROLL_OUTPUT+CURRENT_SETPOINT[1]
-        SET_TO_PUB[3] = PITCH_OUTPUT+CURRENT_SETPOINT[3]
-        SET_TO_PUB[4] = -ROLL_OUTPUT+CURRENT_SETPOINT[4]
-        SET_TO_PUB[6] = PITCH_OUTPUT+CURRENT_SETPOINT[6]
-        SET_TO_PUB[7] = ROLL_OUTPUT+CURRENT_SETPOINT[7]
-        SET_TO_PUB[9] = PITCH_OUTPUT+CURRENT_SETPOINT[9]
-        SET_TO_PUB[10] = -ROLL_OUTPUT+CURRENT_SETPOINT[10]
-
-        #publishing happens at the end of this callback
-    else:
-        global SET_TO_PUB
-        SET_TO_PUB = CURRENT_SETPOINT
-    
-    #actually publish the setpoint
-    if(DEFAULTS.IMU_ON):
-        SET_PUB.publish(Float64MultiArray(data=SET_TO_PUB))
     ORI_PUB.publish(Float64MultiArray(data=ORI))
 
 '''
@@ -139,10 +140,9 @@ This does the actual subscribing and calling the callback
 '''
 def publisher_subscriber(): 
     #initilize the node
-    rospy.init_node("STABILIZER")
+    rospy.init_node("IMU_DATA_PUBLISHER")
 
     #read the SETPOINT_TOPIC to set the current setpoint
-    rospy.Subscriber("CMDS_RAW", Float64MultiArray, setpoint_callback)
     rospy.Subscriber("CONTROL_MODE", Int16, mode_callback)
     #read the topic we're subscribing to and execute CALLBACK
     rospy.Subscriber("/mavros/imu/data", Imu, callback)
