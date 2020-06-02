@@ -29,11 +29,13 @@ trajRunner = TRAJECTORY()
 cmaCalc = CMA()
 CURRENT_XYZ = []
 POS = []
+ORI = [0.0, 0.0, 0.0]
 
 '''
 DEFIINE VARIABLES TO PUBLISH
 '''
-CMDS = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] #THIS IS THE DEFAULT "HOME" we should change this to the current foot pose
+LAST_PUB = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] #THIS IS THE DEFAULT "HOME" we should change this to the current foot pose
+STABLE = []
 
 '''
 creating publisher up here so on callback we can REPUBLISH
@@ -137,6 +139,43 @@ def publish_CMDS(CMDS):
     #populate and publish the vector
     CMDS_NEW = [ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE]
     CMD_PUB.publish(Float64MultiArray(data=CMDS_NEW))
+    #update global variable
+    global LAST_PUB
+    LAST_PUB = CMDS
+
+#handles getting the current actual platform RPY
+def imu_callback(data):
+    #set the current PITCH of the platform
+    PITCH = data.data[1]
+    vx = data.data[3]
+    vy = data.data[4]
+    #now do something with the pitch
+    if (abs(PITCH) >= 0.12):
+        #first let's set the control mode to stand-sit
+        global MODE
+        MODE = CONTROL_MODE.STAND_SIT
+        #then let's clear the trajectory and add some points
+        COMMAND = [0.05, 0.2, 0.0, 0.05, 0.2, 0.0, 0.05, 0.2, 0.0, 0.05, 0.2, 0.0]
+        trajRunner.clear(COMMAND)
+        trajRunner.addWaypoint(doIK(COMMAND))
+        trajRunner.addWaypoint([-8.0, 0.0, 0.0, -8.0, 0.0, 0.0, -8.0, 0.0, 0.0, -8.0, 0.0, 0.0])
+        trajRunner.addWaypoint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        trajRunner.addWaypoint(DEFAULTS.STARTING_CONFIG)
+        #then it waits for human command to stand up again
+    elif (abs(PITCH) >= 0.09):
+        #first let's set the control mode to stand-sit
+        global MODE
+        MODE = CONTROL_MODE.STAND_SIT
+        #then let's clear the trajectory and publish the last stable command
+        trajRunner.clear(STABLE)
+    else:
+        if(vx==0 and vy==0):
+            global STABLE
+            STABLE = LAST_PUB
+
+    #now actually update the orientation variable
+    global ORI
+    ORI = data.data
 
 #handles getting the current actual foot positions
 def fp_callback(data):
@@ -193,15 +232,19 @@ def joy_callback(data):
     Y = data.buttons[3]
 
     if(A==1.0):
+        trajRunner.clear(POS)
         global MODE
         MODE = CONTROL_MODE.WALK
     if(B==1.0):
+        trajRunner.clear(POS)
         global MODE
         MODE = CONTROL_MODE.STAND_SIT
     if(X==1.0):
+        trajRunner.clear(POS)
         global MODE
         MODE = CONTROL_MODE.DANCE
     if(Y==1.0):
+        trajRunner.clear(POS)
         global MODE
         MODE = CONTROL_MODE.TEST
 
@@ -236,8 +279,8 @@ def joy_callback(data):
 
     if(MODE==CONTROL_MODE.TEST):
         #then publish stand/sit commands
-        if(RB==1.0):
-            COMMAND = [0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0]
+        if(LB==1.0):
+            COMMAND = [0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0]
             CMD = doIK(COMMAND)
             CMD[2] = CMD[2]-10.0
             publish_CMDS(CMD)
@@ -259,6 +302,7 @@ def publisher_subscriber():
     rospy.Subscriber("XYZ_CURRENT", Float64MultiArray, fp_callback)
     rospy.Subscriber("POS", Float64MultiArray, pos_callback)
     rospy.Subscriber("joy", Joy, joy_callback)
+    rospy.Subscriber("ORIENTATION", Float64MultiArray, imu_callback)
 
     #keeps node alive
     rospy.spin()

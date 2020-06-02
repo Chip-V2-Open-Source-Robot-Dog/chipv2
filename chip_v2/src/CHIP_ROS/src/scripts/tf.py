@@ -91,6 +91,9 @@ def callback(data):
     x = data.orientation.x
     y = data.orientation.y
     z = data.orientation.z
+    vx = round(data.angular_velocity.x, 2)
+    vy = round(data.angular_velocity.y, 2)
+    vz = round(data.angular_velocity.z, 2)
 
     #generate the text marker for the IMU data
     marker = Marker(
@@ -132,7 +135,7 @@ def callback(data):
     br.sendTransform(t)
 
     #get the roll/pitch/yaw angles
-    ORI = quaternion_to_euler(w, x, y, z)
+    ORI = quaternion_to_euler(w, x, y, z)+[vx, vy, vz]
     ORI_PUB.publish(Float64MultiArray(data=ORI))
 
 '''
