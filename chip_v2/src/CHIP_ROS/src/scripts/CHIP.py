@@ -162,7 +162,7 @@ def imu_callback(data):
         trajRunner.addWaypoint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         trajRunner.addWaypoint(DEFAULTS.STARTING_CONFIG)
         #then it waits for human command to stand up again
-    elif (abs(PITCH) >= 0.09):
+    elif (abs(PITCH) >= 0.075):
         #first let's set the control mode to stand-sit
         global MODE
         MODE = CONTROL_MODE.STAND_SIT
@@ -282,7 +282,7 @@ def joy_callback(data):
         if(LB==1.0):
             COMMAND = [0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0]
             CMD = doIK(COMMAND)
-            CMD[2] = CMD[2]-10.0
+            CMD[2] = CMD[2]-11.0
             publish_CMDS(CMD)
         if(RB==1.0):
             COMMAND = [0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0]
