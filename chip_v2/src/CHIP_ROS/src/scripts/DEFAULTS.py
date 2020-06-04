@@ -40,7 +40,7 @@ class DEFAULTS():
     JOINT_LIMIT = 50.0
     JL_L = 5.0
     #zeroing and terrain offsets
-    TERRAIN_OFFSET = -0.25
+    TERRAIN_OFFSET = -0.30
     ZERO_OFFSET = -8.0
     #configurations to note
     STARTING_CONFIG = [8, 0, 8, 8, 0, 8, 8, 0, 8, 8, 0, 8]

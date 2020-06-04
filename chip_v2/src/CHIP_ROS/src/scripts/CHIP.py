@@ -153,7 +153,7 @@ def imu_callback(data):
     if (abs(PITCH) >= 0.12):
         #first let's set the control mode to stand-sit
         global MODE
-        MODE = CONTROL_MODE.STAND_SIT
+        MODE = CONTROL_MODE.ERROR
         #then let's clear the trajectory and add some points
         COMMAND = [0.05, 0.2, 0.0, 0.05, 0.2, 0.0, 0.05, 0.2, 0.0, 0.05, 0.2, 0.0]
         trajRunner.clear(COMMAND)
@@ -162,10 +162,8 @@ def imu_callback(data):
         trajRunner.addWaypoint([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         trajRunner.addWaypoint(DEFAULTS.STARTING_CONFIG)
         #then it waits for human command to stand up again
-    elif (abs(PITCH) >= 0.075):
-        #first let's set the control mode to stand-sit
-        global MODE
-        MODE = CONTROL_MODE.STAND_SIT
+    elif (abs(PITCH) >= 0.075 and not(MODE==CONTROL_MODE.ERROR)):
+        #we DON'T NEED TO CHANGE THE CONTROL MODE this is NOT a fault condition! 
         #then let's clear the trajectory and publish the last stable command
         trajRunner.clear(STABLE)
     else:
@@ -182,10 +180,10 @@ def fp_callback(data):
     #set the current foot_pos
     global CURRENT_XYZ
     CURRENT_XYZ = data.data
-    #now we need to run the trajectory runner
-    if(MODE==CONTROL_MODE.STAND_SIT):
-        #tick the trajectory runner 
-        publish_CMDS(trajRunner.tick(POS))
+
+    #tick the trajectory runner 
+    ''' FOR NOW WE'RE ONLY USING TRAJECTORY so in ALL modes this happens'''
+    publish_CMDS(trajRunner.tick(POS))
 
 #handles getting the current actual foot positions IN THE USER COORD FRAME/not RAW FRAME
 def pos_callback(data):
@@ -271,22 +269,25 @@ def joy_callback(data):
     if(MODE==CONTROL_MODE.WALK):
         #then we're going to add the walking points
         #to the trajectory
-        pass  
+        if(LB==1.0 and len(trajRunner.waypoints)==0):
+            #test walking here
+            GATE = 0.1
+            COMMAND = doIK([0.05-0.07, 0.5, 0.0, 0.05-0.07, 0.5, 0.0, 0.05-0.07, 0.5, 0.0, 0.05-0.07, 0.5, 0.0])
+            trajRunner.addWaypoint(COMMAND)
+            COMMAND[2] = COMMAND[2]-15.0
+            COMMAND[11] = COMMAND[11]-2.0
+            trajRunner.addWaypoint(COMMAND)
+        if(RB==1.0):
+            #if i clear the trajectory "abort", send it to the last stable position
+            trajRunner.clear(STABLE)
 
     if(MODE==CONTROL_MODE.DANCE):
         #will be written later
         pass
 
     if(MODE==CONTROL_MODE.TEST):
-        #then publish stand/sit commands
-        if(LB==1.0):
-            COMMAND = [0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0, 0.02, 0.5, 0.0]
-            CMD = doIK(COMMAND)
-            CMD[2] = CMD[2]-11.0
-            publish_CMDS(CMD)
-        if(RB==1.0):
-            COMMAND = [0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0, 0.05, 0.5, 0.0]
-            publish_CMDS(doIK(COMMAND))
+        #insert any TEST code here - mode is ONLY for testing
+        pass
 
     #actually publish the setpoint
     MODE_PUB.publish(Int16(data=MODE))
