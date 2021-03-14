@@ -144,13 +144,21 @@ public class Robot extends TimedRobot {
             "fr_s", "fr_h", "fr_k", "fr_s_current", "fr_h_current", "fr_k_current",
             "bl_s", "bl_h", "bl_k", "bl_s_current", "bl_h_current", "bl_k_current", 
             "br_s", "br_h", "br_k", "br_s_current", "br_h_current", "br_k_current",
-            "VBUS"
+            "VBUS",
+            "fl_sv", "fl_hv", "fl_kv",
+            "fr_sv", "fr_hv", "fr_kv",
+            "bl_sv", "bl_hv", "bl_kv",
+            "br_sv", "br_hv", "br_kv"
         );
         networking.addInputs(
             "fl_s", "fl_h", "fl_k",
             "fr_s", "fr_h", "fr_k",
             "bl_s", "bl_h", "bl_k",
-            "br_s", "br_h", "br_k"
+            "br_s", "br_h", "br_k",
+            "fl_sv", "fl_hv", "fl_kv",
+            "fr_sv", "fr_hv", "fr_kv",
+            "bl_sv", "bl_hv", "bl_kv",
+            "br_sv", "br_hv", "br_kv"
         );
 
         //ENABLE THE ROBOT WITH DS
