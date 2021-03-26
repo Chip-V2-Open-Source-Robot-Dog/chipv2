@@ -237,6 +237,7 @@ public class Robot extends TimedRobot {
             "bl_s", "bl_h", "bl_k", "bl_s_current", "bl_h_current", "bl_k_current", 
             "br_s", "br_h", "br_k", "br_s_current", "br_h_current", "br_k_current",
             "VBUS",
+            //ADDING IN VELOCITIES FOR P-PDOT CONTROL
             "fl_sv", "fl_hv", "fl_kv",
             "fr_sv", "fr_hv", "fr_kv",
             "bl_sv", "bl_hv", "bl_kv",
@@ -267,6 +268,9 @@ public class Robot extends TimedRobot {
         networking.pushReadout("fl_s", fl_shoulder.getEncoder().getPosition());
         networking.pushReadout("fl_h", fl_hinge.getEncoder().getPosition());
         networking.pushReadout("fl_k", fl_knee.getEncoder().getPosition());
+        networking.pushReadout("fl_sv", fl_shoulder.getEncoder().getVelocity());
+        networking.pushReadout("fl_hv", fl_hinge.getEncoder().getVelocity());
+        networking.pushReadout("fl_kv", fl_knee.getEncoder().getVelocity());
         networking.pushReadout("fl_s_current", fl_shoulder.getOutputCurrent());
         networking.pushReadout("fl_h_current", fl_hinge.getOutputCurrent());
         networking.pushReadout("fl_k_current", fl_knee.getOutputCurrent());
@@ -275,6 +279,9 @@ public class Robot extends TimedRobot {
         networking.pushReadout("fr_s", fr_shoulder.getEncoder().getPosition());
         networking.pushReadout("fr_h", fr_hinge.getEncoder().getPosition());
         networking.pushReadout("fr_k", fr_knee.getEncoder().getPosition());
+        networking.pushReadout("fr_sv", fr_shoulder.getEncoder().getVelocity());
+        networking.pushReadout("fr_hv", fr_hinge.getEncoder().getVelocity());
+        networking.pushReadout("fr_kv", fr_knee.getEncoder().getVelocity());
         networking.pushReadout("fr_s_current", fr_shoulder.getOutputCurrent());
         networking.pushReadout("fr_h_current", fr_hinge.getOutputCurrent());
         networking.pushReadout("fr_k_current", fr_knee.getOutputCurrent());
@@ -283,6 +290,9 @@ public class Robot extends TimedRobot {
         networking.pushReadout("bl_s", bl_shoulder.getEncoder().getPosition());
         networking.pushReadout("bl_h", bl_hinge.getEncoder().getPosition());
         networking.pushReadout("bl_k", bl_knee.getEncoder().getPosition());
+        networking.pushReadout("bl_sv", bl_shoulder.getEncoder().getVelocity());
+        networking.pushReadout("bl_hv", bl_hinge.getEncoder().getVelocity());
+        networking.pushReadout("bl_kv", bl_knee.getEncoder().getVelocity());
         networking.pushReadout("bl_s_current", bl_shoulder.getOutputCurrent());
         networking.pushReadout("bl_h_current", bl_hinge.getOutputCurrent());
         networking.pushReadout("bl_k_current", bl_knee.getOutputCurrent());
@@ -291,6 +301,9 @@ public class Robot extends TimedRobot {
         networking.pushReadout("br_s", br_shoulder.getEncoder().getPosition());
         networking.pushReadout("br_h", br_hinge.getEncoder().getPosition());
         networking.pushReadout("br_k", br_knee.getEncoder().getPosition());
+        networking.pushReadout("br_sv", br_shoulder.getEncoder().getVelocity());
+        networking.pushReadout("br_hv", br_hinge.getEncoder().getVelocity());
+        networking.pushReadout("br_kv", br_knee.getEncoder().getVelocity());
         networking.pushReadout("br_s_current", br_shoulder.getOutputCurrent());
         networking.pushReadout("br_h_current", br_hinge.getOutputCurrent());
         networking.pushReadout("br_k_current", br_knee.getOutputCurrent());
@@ -341,7 +354,10 @@ public class Robot extends TimedRobot {
 
         //INSER THE CODE TO SET THE VELOCITIES HERE!!!!
         //FOR NOW JUST USE THE SLOW METHOD!!! AND SEE HOW IT ACCELERATES
-        //SEE HOW MUCH SMOOTHER IS THIS, THEN GO INTO THE SETTING VELOCITIES THING
+        
+        //SEE HOW MUCH SMOOTHER IS THIS, THEN GO INTO THE SETTING VELOCITIES THING 
+
+        //TEST WE ARE GETTING ACCURATE VELOCITIES ON ROBORIO SIDE TOO!!! **MAY NEED TO ACCOUNT FOR DIRECTION SWITCH!!!
 
 
         //=====================================================//
