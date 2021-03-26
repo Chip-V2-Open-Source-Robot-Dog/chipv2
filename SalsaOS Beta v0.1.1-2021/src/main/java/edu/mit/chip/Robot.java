@@ -48,20 +48,20 @@ public class Robot extends TimedRobot {
     private final double kP_S = 0.2;
     private final double kI_S = 0.00001;
     private final double kD_S = 0.4;
-    private final double kMaxOutput_S = 0.14;
-    private final double kMinOutput_S = -0.14;
+    private final double kMaxOutput_S = 1.0;//0.14;
+    private final double kMinOutput_S = -1.0;//-0.14;
     //HINGE CONSTANTS
     private final double kP_H = 0.2;
     private final double kI_H = 0.00001;
     private final double kD_H = 0.4;
-    private final double kMaxOutput_H = 0.14;
-    private final double kMinOutput_H = -0.14;
+    private final double kMaxOutput_H = 1.0;//0.14;
+    private final double kMinOutput_H = -1.0;//-0.14;
     //KNEE CONSTANTS
     private final double kP_K = 0.15;
     private final double kI_K = 0.00001;
     private final double kD_K = 0.1;
-    private final double kMaxOutput_K = 0.14;
-    private final double kMinOutput_K = -0.14;
+    private final double kMaxOutput_K = 1.0;//0.14;
+    private final double kMinOutput_K = -1.0;//-0.14;
 
     private Networking networking;
     // private Thread networkingThread;
@@ -134,6 +134,98 @@ public class Robot extends TimedRobot {
         shoulderPID.load(br_shoulder.getPIDController());
         hingePID.load(br_hinge.getPIDController());
         kneePID.load(br_knee.getPIDController());
+
+
+        //=====================================================//
+        //                                                     //
+        //                SMART MOTION SETUP                   //
+        //                                                     //
+        //=====================================================//
+
+
+        /*
+        NOW SETUP SMART MOTION
+        WE WANT TO PULL A DESIRED VEL IN RAD/S FROM JETSON
+        AND SET A VELOCITY AND ACCEL SCALED BY THAT
+        */
+        int smartMotionSlot = 0;
+        double initMaxVel = 0.14*5700.0;
+        double minVel = 0.0;
+        double initMaxAccel = initMaxVel;
+        double allowedErr = 0.5; //half a rotation of allowed ERROR for now (because of the 100:1) --> 1.8deg of error (can drop this later)
+
+        //SET THE SHOULDER SMART MOTION
+        fl_shoulder.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fl_shoulder.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fl_shoulder.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fl_shoulder.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        fr_shoulder.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fr_shoulder.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fr_shoulder.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fr_shoulder.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        bl_shoulder.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        bl_shoulder.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        bl_shoulder.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        bl_shoulder.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        br_shoulder.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        br_shoulder.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        br_shoulder.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        br_shoulder.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        //SET HINGE SMART MOTION
+        fl_hinge.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fl_hinge.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fl_hinge.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fl_hinge.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        fr_hinge.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fr_hinge.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fr_hinge.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fr_hinge.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        bl_hinge.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        bl_hinge.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        bl_hinge.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        bl_hinge.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        br_hinge.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        br_hinge.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        br_hinge.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        br_hinge.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        //SET KNEE SMART MOTION
+        fl_knee.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fl_knee.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fl_knee.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fl_knee.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        fr_knee.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        fr_knee.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        fr_knee.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        fr_knee.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        bl_knee.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        bl_knee.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        bl_knee.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        bl_knee.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+        br_knee.getPIDController().setSmartMotionMaxVelocity(initMaxVel, smartMotionSlot);
+        br_knee.getPIDController().setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        br_knee.getPIDController().setSmartMotionMaxAccel(initMaxAccel, smartMotionSlot);
+        br_knee.getPIDController().setSmartMotionAllowedClosedLoopError(allowedErr,0);
+
+
+
+        //=====================================================//
+        //                                                     //
+        //                REST OF ROBOT SETUP                  //
+        //                                                     //
+        //=====================================================//
+
+
 
         System.out.println("Robot initialized.");
 
@@ -239,22 +331,42 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void teleopPeriodic() {
-        //SET THE VALUES TO WHAT IS PULLED FROM NETWORK TABLES 
-        fl_shoulder.getPIDController().setReference(networking.pullInput("fl_s", 0.0), MotorControlType.POSITION.sparkMaxType);
-        fl_hinge.getPIDController().setReference(networking.pullInput("fl_h", 0.0), MotorControlType.POSITION.sparkMaxType);
-        fl_knee.getPIDController().setReference(networking.pullInput("fl_k", 0.0), MotorControlType.POSITION.sparkMaxType);
 
-        fr_shoulder.getPIDController().setReference(networking.pullInput("fr_s", 0.0), MotorControlType.POSITION.sparkMaxType);
-        fr_hinge.getPIDController().setReference(networking.pullInput("fr_h", 0.0), MotorControlType.POSITION.sparkMaxType);
-        fr_knee.getPIDController().setReference(networking.pullInput("fr_k", 0.0), MotorControlType.POSITION.sparkMaxType);
+        //=====================================================//
+        //                                                     //
+        //                SMART MOTION VALUES                  //
+        //                                                     //
+        //=====================================================//
 
-        bl_shoulder.getPIDController().setReference(networking.pullInput("bl_s", 0.0), MotorControlType.POSITION.sparkMaxType);
-        bl_hinge.getPIDController().setReference(networking.pullInput("bl_h", 0.0), MotorControlType.POSITION.sparkMaxType);
-        bl_knee.getPIDController().setReference(networking.pullInput("bl_k", 0.0), MotorControlType.POSITION.sparkMaxType);
 
-        br_shoulder.getPIDController().setReference(networking.pullInput("br_s", 0.0), MotorControlType.POSITION.sparkMaxType);
-        br_hinge.getPIDController().setReference(networking.pullInput("br_h", 0.0), MotorControlType.POSITION.sparkMaxType);
-        br_knee.getPIDController().setReference(networking.pullInput("br_k", 0.0), MotorControlType.POSITION.sparkMaxType);
+        //INSER THE CODE TO SET THE VELOCITIES HERE!!!!
+        //FOR NOW JUST USE THE SLOW METHOD!!! AND SEE HOW IT ACCELERATES
+        //SEE HOW MUCH SMOOTHER IS THIS, THEN GO INTO THE SETTING VELOCITIES THING
+
+
+        //=====================================================//
+        //                                                     //
+        //                SET ALL JOINT SETPOINTS              //
+        //                                                     //
+        //=====================================================//
+
+
+        //SET THE VALUES TO WHAT IS PULLED FROM NETWORK TABLES --> POSITION + SMART MOTION CONTROL!!!
+        fl_shoulder.getPIDController().setReference(networking.pullInput("fl_s", 0.0), ControlType.kSmartMotion); //UPDATE THE MOTOR CONTROL STRUCT ABOVE LATER
+        fl_hinge.getPIDController().setReference(networking.pullInput("fl_h", 0.0), ControlType.kSmartMotion);
+        fl_knee.getPIDController().setReference(networking.pullInput("fl_k", 0.0), ControlType.kSmartMotion);
+
+        fr_shoulder.getPIDController().setReference(networking.pullInput("fr_s", 0.0), ControlType.kSmartMotion);
+        fr_hinge.getPIDController().setReference(networking.pullInput("fr_h", 0.0), ControlType.kSmartMotion);
+        fr_knee.getPIDController().setReference(networking.pullInput("fr_k", 0.0), ControlType.kSmartMotion);
+
+        bl_shoulder.getPIDController().setReference(networking.pullInput("bl_s", 0.0), ControlType.kSmartMotion);
+        bl_hinge.getPIDController().setReference(networking.pullInput("bl_h", 0.0), ControlType.kSmartMotion);
+        bl_knee.getPIDController().setReference(networking.pullInput("bl_k", 0.0), ControlType.kSmartMotion);
+
+        br_shoulder.getPIDController().setReference(networking.pullInput("br_s", 0.0), ControlType.kSmartMotion);
+        br_hinge.getPIDController().setReference(networking.pullInput("br_h", 0.0), ControlType.kSmartMotion);
+        br_knee.getPIDController().setReference(networking.pullInput("br_k", 0.0), ControlType.kSmartMotion);
     }
     
     /**
